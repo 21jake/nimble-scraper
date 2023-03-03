@@ -1,16 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  firstName: string;
+  @Column({ type: 'varchar', length: 20, nullable: false, unique: true })
+  username: string;
 
-  @Column()
-  lastName: string;
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  password: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: true,
+  })
+  createdDate: Date;
+
+  token?: string;
 }

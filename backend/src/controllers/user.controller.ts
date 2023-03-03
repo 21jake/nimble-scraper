@@ -1,22 +1,19 @@
-import { Controller, Get, Post } from "@nestjs/common";
-import { User } from "src/entities/user.entity";
-import { UserService } from "src/services/user.service";
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { SignUpDto } from 'src/dto/user.dto';
+import { User } from 'src/entities/user.entity';
+import { UserService } from 'src/services/user.service';
 
-@Controller('api/users')
+@Controller('/api')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
+  @Get('/')
+  async findAll() {
+    return await this.userService.findAll();
+  }
 
-    @Get('/')
-    async findAll() {
-        return await this.userService.findAll();
-    }
-
-    @Post('/')
-    async create() {
-        const user = new User();
-        user.firstName = 'test';
-        user.lastName = 'test';
-        return await this.userService.create(user);
-    }
+  @Post('/signup')
+  async create(@Body() dto: SignUpDto) {
+    return await this.userService.create(dto);
+  }
 }

@@ -1,6 +1,6 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { diskStorage } from 'multer';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { extname } from 'path';
 import { appEnv } from 'src/configs/config';
 

@@ -9,6 +9,3 @@ export const userProviders = [
     inject: [DataSource],
   },
 ];
-
-
-// Write timetable

@@ -1,0 +1,11 @@
+Migration script examples:
+
+
+Recommended: Manually writing + running/reverting migrations
+- create: yarn run migrate:create ./src/database/migrations/{{name}}
+- run: yarn run migrate:run
+- revert: yarn run migrate:revert
+
+
+Not recommended: Using the TypeORM to generate migrations 
+- generate: yarn run migrate:generate ./src/database/migrations/{{name}}

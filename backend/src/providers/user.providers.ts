@@ -1,4 +1,4 @@
-import { Repositories } from 'src/enums/repositories.enum';
+import { Repositories } from 'src/utils/enums/repositories.enum';
 import { DataSource } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 

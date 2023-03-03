@@ -1,8 +1,8 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { SignUpDto } from 'src/dto/user.dto';
 import { User } from 'src/entities/user.entity';
-import { ErrorResponses } from 'src/enums/error-response.enum';
-import { Repositories } from 'src/enums/repositories.enum';
+import { ErrorResponses } from 'src/utils/enums/error-response.enum';
+import { Repositories } from 'src/utils/enums/repositories.enum';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { appEnv } from 'src/configs/config';

@@ -1,5 +1,5 @@
 import { Batch } from 'src/entities/batch.entity';
-import { Repositories } from 'src/enums/repositories.enum';
+import { Repositories } from 'src/utils/enums/repositories.enum';
 import { DataSource } from 'typeorm';
 
 export const batchProviders = [

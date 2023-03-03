@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Repositories } from 'src/enums/repositories.enum';
+import { Repositories } from 'src/utils/enums/repositories.enum';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 

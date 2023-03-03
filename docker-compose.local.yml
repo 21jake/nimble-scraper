@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  database:
+    ports:
+      - '5432:5432'
+    volumes:
+      - './volumes/postgresql/:/bitnami/postgresql'
+    environment:
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=local
+  backend:
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_HOST=database
+    ports:
+      - 5000:5000

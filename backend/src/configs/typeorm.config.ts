@@ -4,7 +4,7 @@ import { appEnv } from './config';
 
 
 const AppDataSource =  new DataSource({
-    type: "mysql",
+    type: "postgres",
     database: appEnv.DATABASE_NAME,
     host: appEnv.DATABASE_HOST,
     username: appEnv.DATABASE_USER,

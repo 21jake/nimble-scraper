@@ -11,7 +11,7 @@ export class Batch {
   originalName: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
-  cachePath: string;
+  fileName: string;
 
   @ManyToOne(() => User, (user) => user.batches, { onDelete: 'CASCADE', nullable: false  })
   uploader: User;

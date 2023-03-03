@@ -10,8 +10,8 @@ export class Keyword {
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  cachePath: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  fileName: string;
 
   @Column({ type: 'boolean', nullable: true })
   success: boolean;

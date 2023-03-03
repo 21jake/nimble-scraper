@@ -3,3 +3,4 @@
 /volumes/postgresql
 /volumes/backend-storage
 /backend/storage/*
+/backend/.cache

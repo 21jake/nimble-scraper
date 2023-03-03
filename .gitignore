@@ -1,3 +1,5 @@
 */node_modules
 /backend/dist
 /volumes/postgresql
+/volumes/backend-storage
+/backend/storage/*

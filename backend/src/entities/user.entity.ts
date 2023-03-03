@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
+import { Batch } from './batch.entity';
 
 @Entity('users')
 export class User {
@@ -10,6 +11,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
+
+  @OneToMany(() => Batch, (batch) => batch.uploader)
+  batches: Batch[];
 
   @CreateDateColumn({
     type: 'timestamp',

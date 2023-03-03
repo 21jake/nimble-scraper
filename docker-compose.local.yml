@@ -17,3 +17,5 @@ services:
       - DATABASE_HOST=database
     ports:
       - 5000:5000
+    volumes:
+      - './volumes/backend-storage/:/backend/storage'

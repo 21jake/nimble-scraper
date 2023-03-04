@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
 import { generateRandomString } from 'src/utils/helpers';
 
-import * as request from 'supertest';
+import request from 'supertest';
 
 describe('Authentication', () => {
   let app: INestApplication;

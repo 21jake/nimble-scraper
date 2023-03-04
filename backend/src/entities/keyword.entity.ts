@@ -16,7 +16,7 @@ export class Keyword {
   success: boolean;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  proxy: boolean;
+  proxy: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   error: string;

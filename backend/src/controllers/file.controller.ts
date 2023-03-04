@@ -1,16 +1,16 @@
 import {
   Controller,
-  FileTypeValidator,
+  FileTypeValidator, Param,
   ParseFilePipe,
-  Post,
+  Post, Request,
+  Sse,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
-  Request,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { readFileSync } from 'fs';
-
+import { Observable } from 'rxjs';
+import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { FileService } from 'src/services/file.service';
 import { csvMulterOptions } from 'src/utils/helpers';
@@ -31,7 +31,22 @@ export class FileController {
     )
     file: Express.Multer.File,
   ) {
-
     return await this.fileService.saveBatch(file, req.user);
   }
+
+  @Sse('/:batchId')
+  @UseGuards(JwtAuthGuard)
+  async streamBatchDetail(
+    @Request() req,
+    @Param('batchId') batchId: string,
+  ): Promise<Observable<IObservableData<IFileEvent>>> {
+    return await this.fileService.streamBatchDetail(batchId, req.user);
+  }
+}
+interface IFileEvent {
+  total: number;
+  keywords: Keyword[];
+}
+interface IObservableData<T> {
+  data: T;
 }

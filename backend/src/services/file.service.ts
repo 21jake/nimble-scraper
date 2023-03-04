@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import { appEnv } from 'src/configs/config';
 import { Batch } from 'src/entities/batch.entity';
 import { Keyword } from 'src/entities/keyword.entity';
 import { User } from 'src/entities/user.entity';
+import { EmittedEvent } from 'src/utils/enums/event.enum';
 import { Repositories } from 'src/utils/enums/repositories.enum';
 import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class FileService {
@@ -16,6 +19,8 @@ export class FileService {
 
     @Inject(Repositories.KEYWORD_REPOSITORY)
     private keywordRepository: Repository<Keyword>,
+
+    private eventEmitter: EventEmitter2,
   ) {}
 
   public async saveBatch(file: Express.Multer.File, user: User) {
@@ -26,7 +31,8 @@ export class FileService {
 
     const newBatch = await this.batchRepository.save(batch);
     await this.saveKeywords(newBatch);
-    // Scraping event emitter should be here
+
+    this.eventEmitter.emit(EmittedEvent.NEW_BATCH, newBatch);
     return newBatch;
   }
 

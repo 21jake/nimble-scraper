@@ -3,16 +3,16 @@ import { pickBy } from "lodash";
 // import axios from 'src/config/axios-interceptor';
 import axios from 'src/config/axios-interceptor';
 
-export interface ILogIn {
+export interface ILogin {
     username: string;
     password: string;
   }
   
-  export interface ISignUp extends ILogIn {
+  export interface ISignup extends ILogin {
     confirmPassword: string;
   }
   
-  export const login = createAsyncThunk(`login`, async (body: ILogIn, thunkAPI) => {
+  export const login = createAsyncThunk(`login`, async (body: ILogin, thunkAPI) => {
     try {
       const { data } = await axios.post(`login`, pickBy(body));
       return data;
@@ -22,7 +22,7 @@ export interface ILogIn {
   });
 
 
-  export const signup = createAsyncThunk(`signup`, async (body: ISignUp, thunkAPI) => {
+  export const signup = createAsyncThunk(`signup`, async (body: ISignup, thunkAPI) => {
     try {
       const { data } = await axios.post(`signup`, pickBy(body));
       return data;
@@ -30,4 +30,12 @@ export interface ILogIn {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   });
-  
+
+  export const getProfile = createAsyncThunk(`profile`, async (_, thunkAPI) => {
+    try {
+      const { data } = await axios.get(`profile`);
+      return data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  });

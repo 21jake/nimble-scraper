@@ -49,6 +49,11 @@ const { actions, reducer } = createSlice({
       state.signupSuccess = false;
       state.getProfileSuccess = false;
     },
+    logout(state) {
+      state.token = undefined;
+      state.user = undefined;
+      localStorage.removeItem('authentication_token');
+    },
   },
   extraReducers: {
     [login.fulfilled.type]: (state, { payload }: PayloadAction<IUser>) => {
@@ -92,5 +97,5 @@ const { actions, reducer } = createSlice({
   },
 });
 
-export const { fetching, resetAll, storeToken, partialReset } = actions;
+export const { fetching, resetAll, storeToken, partialReset, logout } = actions;
 export default reducer;

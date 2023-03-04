@@ -17,6 +17,7 @@ const loading = (
 const Login = React.lazy(() => import('src/components/auth/Login'));
 const Register = React.lazy(() => import('src/components/auth/Register'));
 const Page404 = React.lazy(() => import('src/components/shared/Page404'));
+const Dashboard = React.lazy(() => import('src/components/dashboard'));
 const Page500 = React.lazy(() => import('./components/dummy/pages/page500/Page500'));
 const TheLayout = React.lazy(() => import('./components/containers/TheLayout'));
 
@@ -47,7 +48,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />          
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<>asdasd</>} />
+            <Route path="/dashboard/*" element={<Dashboard/>} />
             <Route path="/*" element={<Page404/>} />
           </Routes>
         </React.Suspense>

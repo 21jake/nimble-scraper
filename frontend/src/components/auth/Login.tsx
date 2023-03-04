@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { cilLockLocked, cilUser } from '@coreui/icons';
+import CIcon from '@coreui/icons-react';
 import {
   CButton,
   CCard,
@@ -12,18 +12,18 @@ import {
   CFormInput,
   CInputGroup,
   CInputGroupText,
-  CRow,
+  CRow
 } from '@coreui/react-pro';
-import CIcon from '@coreui/icons-react';
-import { cilLockLocked, cilUser } from '@coreui/icons';
+import { Formik } from 'formik';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { RootState } from 'src/reducers';
 import { useRouter } from 'src/utils/hooks';
 import * as Yup from 'yup';
-import { ILogin, login } from './auth.api';
 import { ToastError } from '../shared/Toast';
+import { ILogin, login } from './auth.api';
 import { fetching, resetAll } from './auth.reducer';
-import { Formik } from 'formik';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter your username'),

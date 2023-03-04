@@ -1,4 +1,4 @@
-import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons';
+import { cilAccountLogout, cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import {
   CBreadcrumb,
@@ -13,6 +13,7 @@ import {
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../reducers';
+import { logout } from '../auth/auth.reducer';
 import AppBreadcrumb from './AppBreadcrumb';
 import { toggleSidebar } from './reducer';
 
@@ -24,40 +25,21 @@ const TheHeader = () => {
     dispatch(toggleSidebar(!sidebarShow));
   };
 
+  const onLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
-        {/* <CHeaderBrand className="mx-auto d-md-none" >
-      </CHeaderBrand> */}
         <CHeaderNav className="d-flex me-auto">
           <CHeaderToggler className="ps-1" onClick={toggleSidebarDesktop}>
             <CIcon icon={cilMenu} size="lg" />
           </CHeaderToggler>
-        <CNavItem>
-            <CNavLink href="#">Home</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
-          </CNavItem>
         </CHeaderNav>
-        <CHeaderNav>
+        <CHeaderNav onClick={onLogout}>
           <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
+            <CIcon icon={cilAccountLogout} size="lg" />
           </CNavItem>
         </CHeaderNav>
       </CContainer>

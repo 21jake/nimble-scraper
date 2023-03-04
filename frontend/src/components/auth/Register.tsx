@@ -52,7 +52,15 @@ const validationSchema = Yup.object().shape({
 const Register = () => {
   const { navigate } = useRouter();
   const dispatch = useDispatch();
-  const { errorMessage, signupSuccess } = useSelector((state: RootState) => state.authentication);
+  const { errorMessage, signupSuccess, user } = useSelector((state: RootState) => state.authentication);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
 
   useEffect(() => {
     if (errorMessage) {

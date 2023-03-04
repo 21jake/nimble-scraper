@@ -7,7 +7,7 @@ interface IInitialLoginState {
   loading: boolean;
   errorMessage?: string;
   user?: IUser;
-  token?: string;
+  token?: string | null;
   loginSuccess: boolean;
   signupSuccess: boolean;
   getProfileSuccess: boolean;
@@ -51,9 +51,10 @@ const { actions, reducer } = createSlice({
     },
   },
   extraReducers: {
-    [login.fulfilled.type]: (state, { payload }: PayloadAction<{ token: string }>) => {
-      localStorage.setItem(appEnv.TOKEN_LABEL, payload.token);
+    [login.fulfilled.type]: (state, { payload }: PayloadAction<IUser>) => {
+      localStorage.setItem(appEnv.TOKEN_LABEL, String(payload.token));
       state.token = payload.token;
+      state.user = payload;
       state.loginSuccess = true;
       state.loading = false;
     },

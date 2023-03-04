@@ -79,7 +79,7 @@ export class ScraperService {
 
       const singlePageManipulator = new SinglePageManipulator(page);
 
-      const fileName = await singlePageManipulator.writeToFile();
+      const fileName = await singlePageManipulator.writeToFile(keyword); 
       const totalAnchorLinks = await singlePageManipulator.getTotalAnchorLinks();
       const adsCount = await singlePageManipulator.getAdsCount();
       const { searchTime, totalResults } = await singlePageManipulator.getSearchPerf();

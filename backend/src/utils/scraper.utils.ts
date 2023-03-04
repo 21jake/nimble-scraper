@@ -42,8 +42,8 @@ export class SinglePageManipulator {
     this.page = page;
   }
 
-  public async writeToFile() {
-    const fileName = `${dayjs().unix()}.html`;
+  public async writeToFile(keyword: string) {
+    const fileName = `${keyword}-${dayjs().unix()}.html`;
     const htmlContent = await this.page.content();
     await writeFileSync(path.join(appEnv.HTML_CACHE_PATH, fileName), htmlContent);
     return fileName;

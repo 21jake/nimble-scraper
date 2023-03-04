@@ -34,7 +34,7 @@ const Dashboard = ({}: Dashboard) => {
       <div className="wrapper d-flex flex-column min-vh-100 bg-light">
         <TheHeader />
         <div className="body flex-grow-1 px-3">
-          <CContainer fluid className="px-0">
+          <CContainer>
             <Suspense fallback={loading}>
               <Routes>
                 <Route path="/" element={<Overview />} />

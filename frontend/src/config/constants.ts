@@ -4,6 +4,7 @@ export const appEnv = {
   BACKEND_PORT,
   BACKEND_HOST,
   SERVER_API_URL: `http://${BACKEND_HOST}:${BACKEND_PORT}/api`,
-  NODE_ENV
+  NODE_ENV,
+  TOKEN_LABEL: 'authentication_token',
 };
 console.log({appEnv})

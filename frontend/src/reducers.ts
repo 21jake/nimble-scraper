@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
-import container from './components/containers/reducer';
+import container from 'src/components/containers/reducer';
+import authentication from 'src/components/auth/auth.reducer';
 
-const rootReducer = combineReducers({ container });
+const rootReducer = combineReducers({ container, authentication });
 
 export type RootState = ReturnType<typeof rootReducer>;
 

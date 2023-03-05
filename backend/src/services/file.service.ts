@@ -99,7 +99,12 @@ export class FileService {
 
     const entityName = 'batch';
 
-    const query = this.batchRepository.createQueryBuilder(entityName);
+    const query = this.batchRepository
+      .createQueryBuilder(entityName)
+      .loadRelationCountAndMap(`${entityName}.keywordCount`, `${entityName}.keywords`)
+      .loadRelationCountAndMap(`${entityName}.processedCount`, `${entityName}.keywords`, 'keyword', (qb) => {
+        return qb.andWhere('keyword.success IS NOT NULL');
+      });
 
     query.where(`${entityName}.uploaderId = :id`, { id: user.id });
 

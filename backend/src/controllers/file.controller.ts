@@ -54,18 +54,16 @@ export class FileController {
   }
 
   @Sse('/:batchId')
-  @UseGuards(JwtAuthGuard)
   async streamBatchDetail(
-    @Request() req,
     @Param('batchId') batchId: string,
-  ): Promise<Observable<IObservableData<IFileEvent>>> {
-    return await this.fileService.streamBatchDetail(batchId, req.user);
+  ): Promise<Observable<IObservableData<Keyword[]>>> {
+    return await this.fileService.streamBatchDetail(batchId);
   }
 }
-interface IFileEvent {
-  total: number;
-  keywords: Keyword[];
-}
+// interface IFileEvent {
+//   total: number;
+//   keywords: Keyword[];
+// }
 interface IObservableData<T> {
   data: T;
 }

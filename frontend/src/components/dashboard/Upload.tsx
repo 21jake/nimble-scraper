@@ -4,41 +4,88 @@ import {
   CButton,
   CCol,
   CForm,
+  CFormFeedback,
   CFormInput,
   CFormLabel,
-  CLink,
-  CLoadingButton,
-  CProgress,
+  CLink, CProgress,
   CProgressBar,
-  CRow,
+  CRow
 } from '@coreui/react-pro';
 import dayjs from 'dayjs';
+import { Formik } from 'formik';
 import { truncate } from 'lodash';
-import React from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { appEnv } from 'src/config/constants';
 import { IKeyword } from 'src/models/keyword.model';
+import { RootState } from 'src/reducers';
+import { checkIfFileIsCsv } from 'src/utils/helpers';
+import * as Yup from 'yup';
+import { IUploadFile, uploadCsv } from './dashboard.api';
+import { fetching } from './dashboard.reducer';
 import { keywords } from './data';
+
 
 interface IUploadProps {}
 
-const Upload = ({}: IUploadProps) => {
+const initialValues: IUploadFile = {
+  file: undefined,
+};
+
+const validationSchema = Yup.object().shape({
+  file: Yup.mixed().required('File is required').test('is-csv-file', 'Must upload a CSV file', checkIfFileIsCsv),
+});
+
+const Upload = () => {
+  const dispatch = useDispatch();
+  const { errorMessage, batch, uploadSuccess } = useSelector((state: RootState) => state.fileUpload);
+
+  useEffect(() => {
+    console.log({ batch, uploadSuccess });
+  }, [batch, uploadSuccess]);
+
   return (
     <CRow>
       <CCol xs={6} className={`border`}>
-        <CForm>
-          <CFormLabel htmlFor="csvfile">
-            <small>Upload CSV file here</small>
-          </CFormLabel>
-          <CFormInput type="file" id="csvfile" name="file" />
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          onSubmit={(values) => {
+            dispatch(fetching());
+            dispatch(uploadCsv(values));
+            // dispatch(signup(values));
+          }}
+          validationSchema={validationSchema}
+        >
+          {({ isSubmitting, values, errors, touched, handleBlur, handleSubmit, setFieldValue, handleChange }) => (
+            <CForm onSubmit={handleSubmit}>
+              <CFormLabel htmlFor="csvfile">
+                <small>Upload CSV file here</small>
+              </CFormLabel>
+              <CFormInput
+                type="file"
+                id="csvfile"
+                name="file"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setFieldValue('file', e.target.files[0]);
+                  }
+                }}
+              />
 
-          <CButton className={`mt-3`} variant="outline">
-            Submit
-          </CButton>
-          <CProgress className="mt-3">
-            <CProgressBar color="primary" variant="striped" animated value={25} />
-          </CProgress>
-        </CForm>
+              <CFormFeedback invalid className={!!errors.file && touched.file ? 'd-block' : 'd-none'}>
+                {errors.file}
+              </CFormFeedback>
 
+              <CButton className={`mt-3`} variant="outline" type="submit">
+                Submit
+              </CButton>
+              <CProgress className="mt-3">
+                <CProgressBar color="primary" variant="striped" animated value={25} />
+              </CProgress>
+            </CForm>
+          )}
+        </Formik>
         <RecordDetails />
       </CCol>
 
@@ -55,13 +102,6 @@ const Upload = ({}: IUploadProps) => {
 interface IKeywordDetailsProps {
   keyword: IKeyword;
 }
-// eyword
-// 	Status
-// 	Ads count
-// 	Links count
-// 	Total results
-// 	Search time
-// 	HTML
 
 const KeywordDetails = (props: IKeywordDetailsProps) => {
   const { keyword } = props;

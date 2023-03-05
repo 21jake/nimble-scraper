@@ -1,4 +1,4 @@
-import { cilSearch } from '@coreui/icons';
+import { cilFilterX, cilReload, cilSearch } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import {
   CBadge,
@@ -14,6 +14,7 @@ import {
   CRow,
   CSmartPagination,
   CSmartTable,
+  CTooltip
 } from '@coreui/react-pro';
 import { Formik } from 'formik';
 import { truncate } from 'lodash';
@@ -79,6 +80,10 @@ const columns = [
     sorter: false,
   },
 ];
+export const statusBadge = (success: null | boolean) => {
+  const { text, color } = getKeywordStatus(success);
+  return <CBadge color={color}>{text}</CBadge>;
+};
 
 const KeywordsOverview = (props: ITabPaneProps) => {
   const { activeKey, batchId } = props;
@@ -90,7 +95,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
   });
 
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { totalItems, cacheBatches } = initialState;
+  const { totalItems, cacheBatches, loading } = initialState;
   const totalPages = Math.ceil(totalItems / filterState.size);
 
   const handlePaginationChange = (page: number) => {
@@ -103,10 +108,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
   const keywords = useSelector(dashboardSelectors.selectAll);
   const indexedKeywords = createIndexes(keywords, filterState);
 
-  const statusBadge = (success: null | boolean) => {
-    const { text, color } = getKeywordStatus(success);
-    return <CBadge color={color}>{text}</CBadge>;
-  };
+
 
   const csvMultipleOption = cacheBatches.map((element) => ({
     value: element.id,
@@ -154,7 +156,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   />
                 </CInputGroup>
               </CCol>
-              <CCol xs={3}>
+              <CCol xs={3} md={2}>
                 <CFormSelect id="status" name="status" onChange={handleChange} value={values.status}>
                   <option value="">Status</option>
                   <option value={'PENDING'}>PENDING</option>
@@ -162,12 +164,12 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   <option value={'FAILED'}>FAILED</option>
                 </CFormSelect>
               </CCol>
-              <CCol xs={3}>
+              <CCol xs={3} >
                 <CMultiSelect
                   key={`CSV${JSON.stringify(csvMultipleOption)}`}
-                  placeholder="CSV"
+                  placeholder="Select CSV"
                   id="batchId"
-                  options={[{ value: '', text: 'CSV' }, ...csvMultipleOption]}
+                  options={[{ value: '', text: 'All' }, ...csvMultipleOption]}
                   onChange={(selected) => {
                     const [chosenBatch] = selected;
                     if (chosenBatch) {
@@ -179,19 +181,34 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   optionsStyle="text"
                 />
               </CCol>
-              <CCol xs={2}>
-                <CButton
-                  color="secondary"
-                  className={`me-3`}
-                  onClick={() => {
-                    setFieldValue('keyword', '');
-                    setFieldValue('batchId', '');
-                    setFieldValue('status', '');
-                    submitForm();
-                  }}
-                >
-                  Clear
-                </CButton>
+              <CCol xs={3} >
+                <CTooltip content="Clear filter">
+                  <CButton
+                    color="secondary"
+                    variant="outline"
+                    className={` me-3 border-0`}
+                    onClick={() => {
+                      setFieldValue('keyword', '');
+                      setFieldValue('batchId', '');
+                      setFieldValue('status', '');
+                      submitForm();
+                    }}
+                  >
+                    <CIcon icon={cilFilterX} />
+                  </CButton>
+                </CTooltip>
+                <CTooltip content="Reload table">
+                  <CButton
+                    color="info"
+                    variant="outline"
+                    className={` me-3 border-0`}
+                    onClick={() => {
+                      submitForm();
+                    }}
+                  >
+                    <CIcon icon={cilReload} />
+                  </CButton>
+                </CTooltip>
                 <CButton type="submit">Search</CButton>
               </CCol>
             </CRow>

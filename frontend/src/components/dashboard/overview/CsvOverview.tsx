@@ -1,4 +1,4 @@
-import { cilExternalLink, cilSearch } from '@coreui/icons';
+import { cilExternalLink, cilFilterX, cilReload, cilSearch } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import {
   CButton,
@@ -10,7 +10,7 @@ import {
   CRow,
   CSmartPagination,
   CSmartTable,
-  CTooltip
+  CTooltip,
 } from '@coreui/react-pro';
 import dayjs from 'dayjs';
 import { Formik } from 'formik';
@@ -37,7 +37,7 @@ const columns = [
   },
   {
     key: 'totalKeyword',
-    label: 'Processed / Total Kw',
+    label: 'Processed / Total Words',
     filter: false,
     sorter: false,
   },
@@ -67,7 +67,7 @@ const CsvOverview = (props: ITabPaneProps) => {
   const { activeKey, setActiveKey, setBatchId } = props;
   const dispatch = useDispatch();
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { totalItems } = initialState;
+  const { totalItems, loading } = initialState;
 
   const [filterState, setFilterState] = useState<IParams>({
     page: 0,
@@ -123,16 +123,31 @@ const CsvOverview = (props: ITabPaneProps) => {
               </CInputGroup>
             </CCol>
             <CCol xs={6}>
+              <CTooltip content="Clear filter">
               <CButton
                 color="secondary"
-                className={` me-3`}
+                variant="outline"
+                className={` me-3 border-0`}
                 onClick={() => {
                   setFieldValue('keyword', '');
                   submitForm();
                 }}
               >
-                Clear
+                <CIcon icon={cilFilterX} />
               </CButton>
+              </CTooltip>
+              <CTooltip content="Reload table">
+                <CButton
+                  color="info"
+                  variant="outline"
+                  className={` me-3 border-0`}
+                  onClick={() => {
+                    submitForm();
+                  }}
+                >
+                  <CIcon icon={cilReload} />
+                </CButton>
+              </CTooltip>
               <CButton type="submit">Search</CButton>
             </CCol>
           </CForm>
@@ -143,6 +158,7 @@ const CsvOverview = (props: ITabPaneProps) => {
         columns={columns}
         items={indexedBatches}
         itemsPerPage={filterState.size}
+        loading={loading}
         noItemsLabel="No CSV records found"
         scopedColumns={{
           originalName: (item: IBatch) => <td>{item.originalName}</td>,

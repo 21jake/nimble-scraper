@@ -1,32 +1,36 @@
-import { cilArrowThickToTop, cilCheck, cilX } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import {
   CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCardTitle,
   CCol,
   CForm,
   CFormFeedback,
   CFormInput,
   CFormLabel,
-  CLink, CProgress,
+  CImage,
+  CLink,
+  CProgress,
   CProgressBar,
-  CRow
+  CRow,
 } from '@coreui/react-pro';
 import dayjs from 'dayjs';
 import { Formik } from 'formik';
 import { truncate } from 'lodash';
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import InfoLoader from 'src/components/shared/InfoLoader';
 import { appEnv } from 'src/config/constants';
 import { IKeyword } from 'src/models/keyword.model';
 import { RootState } from 'src/reducers';
-import { checkIfFileIsCsv } from 'src/utils/helpers';
+import { checkIfFileIsCsv, getKeywordStatus } from 'src/utils/helpers';
 import * as Yup from 'yup';
 import { IUploadFile, uploadCsv } from '../dashboard.api';
-import { fetching } from '../dashboard.reducer';
-import { keywords } from '../data';
-
-
-interface IUploadProps {}
+import { fetching, setKwProcessedCount, streaming } from '../dashboard.reducer';
+import { statusBadge } from '../overview/KeywordsOverview';
+import CsvImg from 'src/assets/img/csv-icon.png';
 
 const initialValues: IUploadFile = {
   file: undefined,
@@ -39,196 +43,276 @@ const validationSchema = Yup.object().shape({
 const Upload = () => {
   const dispatch = useDispatch();
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { batch, uploadSuccess } = initialState;
+  const { batch, uploadSuccess, streaming } = initialState;
 
-  useEffect(() => {
-    console.log({ batch, uploadSuccess });
-  }, [batch, uploadSuccess]);
+  const [chosenKeyword, setChosenKeyword] = useState<IKeyword | null>(null);
 
   return (
     <CRow>
-      <CCol xs={6} className={`border`}>
-        <Formik
-          enableReinitialize
-          initialValues={initialValues}
-          onSubmit={(values) => {
-            dispatch(fetching());
-            dispatch(uploadCsv(values));
-            // dispatch(signup(values));
-          }}
-          validationSchema={validationSchema}
-        >
-          {({ isSubmitting, values, errors, touched, handleBlur, handleSubmit, setFieldValue, handleChange }) => (
-            <CForm onSubmit={handleSubmit}>
-              <CFormLabel htmlFor="csvfile">
-                <small>Upload CSV file here</small>
-              </CFormLabel>
-              <CFormInput
-                type="file"
-                id="csvfile"
-                name="file"
-                onChange={(e) => {
-                  if (e.target.files) {
-                    setFieldValue('file', e.target.files[0]);
-                  }
-                }}
-              />
+      <CCol xs={12}>
+        <CCard>
+          <CCardHeader>
+            <CCardTitle className={`mb-0`}>Upload file</CCardTitle>
+          </CCardHeader>
+          <CCardBody>
+            <CRow>
+              <CCol xs={6}>
+                <Formik
+                  enableReinitialize
+                  initialValues={initialValues}
+                  onSubmit={(values) => {
+                    dispatch(fetching());
+                    dispatch(uploadCsv(values));
+                    // dispatch(signup(values));
+                  }}
+                  validationSchema={validationSchema}
+                >
+                  {({
+                    isSubmitting,
+                    values,
+                    errors,
+                    touched,
+                    handleBlur,
+                    handleSubmit,
+                    setFieldValue,
+                    handleChange,
+                  }) => (
+                    <CForm onSubmit={handleSubmit}>
+                      <CFormInput
+                        type="file"
+                        id="csvfile"
+                        name="file"
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            setFieldValue('file', e.target.files[0]);
+                          }
+                        }}
+                      />
 
-              <CFormFeedback invalid className={!!errors.file && touched.file ? 'd-block' : 'd-none'}>
-                {errors.file}
-              </CFormFeedback>
+                      <CFormFeedback invalid className={!!errors.file && touched.file ? 'd-block' : 'd-none'}>
+                        {errors.file}
+                      </CFormFeedback>
 
-              <CButton className={`mt-3`} variant="outline" type="submit">
-                Submit
-              </CButton>
-              <CProgress className="mt-3">
-                <CProgressBar color="primary" variant="striped" animated value={25} />
-              </CProgress>
-            </CForm>
-          )}
-        </Formik>
-        <RecordDetails />
-      </CCol>
+                      <CButton className={`mt-3`} variant="outline" type="submit" disabled={streaming}>
+                        Submit
+                      </CButton>
+                    </CForm>
+                  )}
+                </Formik>
+                <RecordDetails />
+              </CCol>
 
-      <CCol xs={6} className={`border`}>
-        <KeywordDetails keyword={keywords[10]} />
-      </CCol>
-      <CCol xs={12} className={`border border-danger mt-3`}>
-        <KeywordList />
+              <CCol xs={6}>
+                <KeywordDetails keyword={chosenKeyword} />
+              </CCol>
+              <CCol xs={12} className={`  mt-3`}>
+                <KeywordList setChosenKeyword={setChosenKeyword} />
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
       </CCol>
     </CRow>
   );
 };
 
 interface IKeywordDetailsProps {
-  keyword: IKeyword;
+  keyword: IKeyword | null;
 }
 
 const KeywordDetails = (props: IKeywordDetailsProps) => {
   const { keyword } = props;
 
-  const htmlHref = keyword.fileName ? `${appEnv.SERVER_URL}/${keyword.fileName}` : null;
-
-  const keywordStatus = (success: null | boolean) => {
-    if (success === null) {
-      return 'Pending';
-    }
-    if (success) {
-      return 'Success';
-    } else {
-      return 'Failed';
-    }
-  };
+  const htmlHref = keyword?.fileName ? `${appEnv.SERVER_URL}/${keyword.fileName}` : null;
 
   return (
     <CRow>
       <CCol xs={12}>
-        <h6 className="my-3 lead">Keyword Details</h6>
-      </CCol>
-      <CCol xs={12}>
-        <p>
-          <span className={`fw-semibold`}>Name:</span> {keyword.name}
-        </p>
-      </CCol>
-      <CCol xs={12}>
-        <p>
-          <span className={`fw-semibold`}>Cache:</span>{' '}
-          {htmlHref ? (
-            <CLink href={htmlHref} target="_blank">
-              {keyword.fileName}
-            </CLink>
-          ) : (
-            '_'
-          )}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Status:</span> {keywordStatus(keyword.success)}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Total Ads:</span> {keyword.totalAds || '_'}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Total Links:</span> {keyword.totalLinks || '_'}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Total Results:</span>{' '}
-          {keyword.totalResults ? Number(keyword.totalResults).toLocaleString('vi') : '_'}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Search Time:</span> {keyword.searchTime || '_'}
-        </p>
-      </CCol>
-      <CCol xs={6}>
-        <p>
-          <span className={`fw-semibold`}>Cache:</span> {keyword.totalLinks || '_'}
-        </p>
+        <CCard>
+          <CCardHeader>
+            <CCardTitle className={`mb-0`}>Keyword inpector</CCardTitle>
+          </CCardHeader>
+          <CCardBody>
+            <CRow>
+              <CCol xs={12}>
+                <h6 className="mb-3 lead">{keyword ? 'Keyword details' : 'Click on any keyword to inspect'}</h6>
+              </CCol>
+              <CCol xs={12}>
+                <p>
+                  <span className={`fw-semibold`}>Name:</span> {keyword?.name || <InfoLoader width={200} />}
+                </p>
+              </CCol>
+              <CCol xs={12}>
+                <p>
+                  <span className={`fw-semibold`}>Cache:</span>{' '}
+                  {htmlHref ? (
+                    <CLink href={htmlHref} target="_blank">
+                      {keyword?.fileName}
+                    </CLink>
+                  ) : (
+                    <InfoLoader width={200} />
+                  )}
+                </p>
+              </CCol>
+              <CCol xs={6}>
+                <p>
+                  <span className={`fw-semibold`}>Status:</span>{' '}
+                  {keyword ? statusBadge(keyword.success) : <InfoLoader />}
+                </p>
+              </CCol>
+              <CCol xs={6}>
+                <p>
+                  <span className={`fw-semibold`}>Total Ads:</span> {keyword?.totalAds || <InfoLoader />}
+                </p>
+              </CCol>
+              <CCol xs={6}>
+                <p>
+                  <span className={`fw-semibold`}>Total Links:</span> {keyword?.totalLinks || <InfoLoader />}
+                </p>
+              </CCol>
+              <CCol xs={6}>
+                <p>
+                  <span className={`fw-semibold`}>Total Results:</span>{' '}
+                  {keyword?.totalResults ? Number(keyword.totalResults).toLocaleString('vi') : <InfoLoader />}
+                </p>
+              </CCol>
+              <CCol xs={6}>
+                <p>
+                  <span className={`fw-semibold`}>Search Time:</span>{' '}
+                  {keyword?.searchTime ? `${keyword?.searchTime} s` : <InfoLoader />}
+                </p>
+              </CCol>
+              {keyword?.error ? (
+                <CCol xs={12}>
+                  <p>
+                    <span className={`fw-semibold`}>Failure Reason:</span> {keyword?.error}
+                  </p>
+                </CCol>
+              ) : (
+                ''
+              )}
+            </CRow>
+          </CCardBody>
+        </CCard>
       </CCol>
     </CRow>
   );
 };
 
-const KeywordList = () => {
-  const keywordColor = (success: null | boolean) => {
-    if (success === null) {
-      return 'warning';
-    }
-    if (success) {
-      return 'success';
-    } else {
-      return 'danger';
-    }
-  };
+interface IKeywordListProps {
+  setChosenKeyword: Dispatch<SetStateAction<IKeyword | null>>;
+}
 
-  const keywordIcon = (success: null | boolean) => {
-    if (success === null) {
-      return cilArrowThickToTop;
+const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
+  const dispatch = useDispatch();
+  const { initialState } = useSelector((state: RootState) => state.dashboard);
+  const { batch } = initialState;
+  const [keywords, setKeywords] = useState<IKeyword[]>([]);
+  // const keywordz = useSelector(dashboardSelectors.selectAll);
+
+  useEffect(() => {
+    console.log('UEH works');
+    if (batch) {
+      dispatch(streaming(true));
+      const eventSource = new EventSource(`${appEnv.SERVER_API_URL}/file/${batch.id}`);
+      eventSource.onmessage = (e) => {
+        const kws: IKeyword[] = JSON.parse(e.data);
+        console.log(kws);
+        setKeywords(kws);
+
+        const totalCompleted = kws.filter((kw) => kw.success !== null).length;
+        dispatch(setKwProcessedCount(totalCompleted));
+
+        if (totalCompleted === batch.keywordCount) {
+          console.log('CLOSE EVENT SOURCE');
+          dispatch(streaming(false));
+          eventSource.close();
+        }
+      };
+
+      // if (batch.status === 'completed') {}
     }
-    if (success) {
-      return cilCheck;
-    } else {
-      return cilX;
-    }
-  };
+  }, [batch]);
 
   return (
     <CRow className={`mt-3`}>
-      {keywords.map((keyword, index) => {
-        return (
-          <CCol xs={2} key={index}>
-            <CButton color={keywordColor(keyword.success)} variant="outline" className={`border-0`} size="sm">
-              <CIcon icon={keywordIcon(keyword.success)} /> {truncate(`${keyword.name}`, { length: 13 })}
-            </CButton>
-          </CCol>
-        );
-      })}
+      <CCol xs={12}>
+        <CCard>
+          <CCardHeader>
+            <CCardTitle className={`mb-0`}>Keyword lists</CCardTitle>
+          </CCardHeader>
+          <CCardBody>
+            <CRow>
+              {keywords.length ? (
+                keywords.map((keyword) => {
+                  const { color, icon } = getKeywordStatus(keyword.success);
+                  return (
+                    <CCol xs={4} key={keyword.id}>
+                      <CButton
+                        color={color}
+                        variant="outline"
+                        className={`border-0`}
+                        size="sm"
+                        onClick={() => {
+                          setChosenKeyword(keyword);
+                          window.scrollTo(0, 0);
+                        }}
+                      >
+                        <CIcon icon={icon} /> {truncate(`${keyword.name}`, { length: 13 })}
+                      </CButton>
+                    </CCol>
+                  );
+                })
+              ) : (
+                <CRow>
+                  <CCol xs={12} className={`d-flex justify-content-center`}>
+                    <CImage src={CsvImg} height={80} className={`constant-tilt-shake`} />
+                  </CCol>
+                  <CCol xs={12} className={`d-flex justify-content-center`}>
+                    <small className={` mt-3`}>Start by uploading a CSV file</small>
+                  </CCol>
+                </CRow>
+              )}
+            </CRow>
+          </CCardBody>
+        </CCard>
+      </CCol>
     </CRow>
   );
 };
 
 const RecordDetails = () => {
+  const { initialState } = useSelector((state: RootState) => state.dashboard);
+  const { batch, uploadSuccess } = initialState;
+
+  if (!batch)
+    return (
+      <CProgress className="mt-3">
+        <CProgressBar color="primary" variant="striped" animated value={0} />
+      </CProgress>
+    );
+
+  const progress = (Number(batch.processedCount) / Number(batch.keywordCount)) * 100;
+
   return (
     <CRow>
       <CCol xs={12}>
-        <h6 className="mt-3 lead">CSV Record details</h6>
+        <CProgress className="mt-3">
+          <CProgressBar color="primary" variant="striped" animated value={progress || 0} />
+        </CProgress>
+      </CCol>
+      <CCol xs={12}>
+        <h6 className="mt-3 lead">{`${batch.originalName}`}</h6>
       </CCol>
       <CCol xs={6}>
         <p>
-          <span className={`fw-semibold`}>Processed keywords:</span> 30/123
+          <span className={`fw-semibold`}>Processed:</span> {`${batch.processedCount} / ${batch.keywordCount}`}
         </p>
       </CCol>
       <CCol xs={6}>
         <p>
-          <span className={`fw-semibold`}> Uploaded:</span> {`${dayjs().format(appEnv.APP_DATE_FORMAT)}`}
+          <span className={`fw-semibold`}> Uploaded:</span>{' '}
+          {`${dayjs(batch?.createdDate).format(appEnv.APP_DATE_FORMAT)}`}
         </p>
       </CCol>
     </CRow>

@@ -13,6 +13,7 @@ interface IInitialFileUploadState {
   fetchEntitiesSuccess: boolean;
   totalItems: number;
   cacheBatches: IBatch[];
+  streaming: boolean;
 }
 
 interface IResponse<T> {
@@ -28,6 +29,7 @@ const initialState: IInitialFileUploadState = {
   fetchEntitiesSuccess: false,
   totalItems: 0,
   cacheBatches: [],
+  streaming: false,
 
 };
 
@@ -42,7 +44,6 @@ const { actions, reducer } = createSlice({
     fetching(state) {
       state.initialState.loading = true;
     },
-
     resetAll(state) {
       state.initialState.loading = false;
       state.initialState.uploadSuccess = false;
@@ -52,6 +53,14 @@ const { actions, reducer } = createSlice({
       state.initialState.totalItems = 0;
       state.initialState.cacheBatches = [];
     },
+    setKwProcessedCount(state, {payload}: PayloadAction<number>) {
+      if (!state.initialState.batch) return;
+      state.initialState.batch.processedCount = payload;
+    },
+    streaming(state, {payload}: PayloadAction<boolean>) {
+      state.initialState.streaming = payload;
+    },
+ 
   },
   extraReducers: {
     [uploadCsv.fulfilled.type]: (state, { payload }: PayloadAction<IBatch>) => {
@@ -90,7 +99,7 @@ const { actions, reducer } = createSlice({
   },
 });
 
-export const { fetching, resetAll } = actions;
+export const { fetching, resetAll, setKwProcessedCount, streaming} = actions;
 
 export const dashboardSelectors = dashboardAdapter.getSelectors<RootState>((state) => state.dashboard);
 

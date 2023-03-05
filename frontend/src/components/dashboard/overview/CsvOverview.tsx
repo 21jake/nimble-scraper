@@ -105,7 +105,7 @@ const CsvOverview = (props: ITabPaneProps) => {
       >
         {({ values, handleSubmit, handleBlur, handleChange, setFieldValue, submitForm }) => (
           <CForm className="form-horizontal row align-items-center " onSubmit={handleSubmit}>
-            <CCol xs={6}>
+            <CCol xs={6} md={4} >
               <CInputGroup className="my-2">
                 <CInputGroupText className="bg-white border-end-0">
                   <CIcon icon={cilSearch} />
@@ -122,7 +122,7 @@ const CsvOverview = (props: ITabPaneProps) => {
                 />
               </CInputGroup>
             </CCol>
-            <CCol xs={6} className="d-flex justify-content-end ">
+            <CCol  className="d-flex justify-content-end ">
               <CTooltip content="Clear filter">
                 <CButton
                   color="secondary"

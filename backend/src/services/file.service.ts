@@ -11,13 +11,17 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { fromEvent, interval, map, Observable, Subject, switchMap } from 'rxjs';
 import { appEnv } from 'src/configs/config';
+import { SortType } from 'src/dto/base-query.dto';
+import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
 import { Batch } from 'src/entities/batch.entity';
 import { Keyword } from 'src/entities/keyword.entity';
 import { User } from 'src/entities/user.entity';
 import { ErrorResponses } from 'src/utils/enums/error-response.enum';
 import { EmittedEvent } from 'src/utils/enums/event.enum';
+import { StatusQuery } from 'src/utils/enums/query.enum';
 import { Repositories } from 'src/utils/enums/repositories.enum';
-import { Repository } from 'typeorm';
+import { RespWrapper } from 'src/utils/response-wrapper';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class FileService {
@@ -41,7 +45,16 @@ export class FileService {
     await this.saveKeywords(newBatch);
 
     this.eventEmitter.emit(EmittedEvent.NEW_BATCH, newBatch);
-    return newBatch;
+
+    const entityName = 'batch';
+    let query = this.batchRepository
+      .createQueryBuilder(entityName)
+      .where(`${entityName}.id = :id`, { id: newBatch.id });
+
+    query = this.addKeywordCountQb(query, entityName);
+
+    const newBatchwithKeywordCount = await query.getOne();
+    return newBatchwithKeywordCount;
   }
 
   private async saveKeywords(batch: Batch) {
@@ -59,7 +72,7 @@ export class FileService {
     return await this.keywordRepository.save(newEntities);
   }
 
-  async streamBatchDetail(batchId: string, user: User) {
+  async streamBatchDetail(batchId: string) {
     const batch = await this.batchRepository.findOne({
       where: { id: Number(batchId) },
       relations: ['uploader'],
@@ -68,11 +81,9 @@ export class FileService {
     if (!batch) {
       throw new BadRequestException(ErrorResponses.RECORD_NOT_FOUND);
     }
-    if (batch.uploader.id !== user.id) {
-      throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
-    }
-
-    const total = await this.keywordRepository.count({ where: { batch: { id: batch.id } } });
+    // if (batch.uploader.id !== user.id) {
+    //   throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
+    // }
 
     return interval(appEnv.DELAY_BETWEEN_CHUNK_MS).pipe(
       switchMap(async (_) => {
@@ -81,12 +92,64 @@ export class FileService {
           order: { success: 1, createdDate: 'ASC' },
         });
         return {
-          data: {
-            total,
-            keywords,
-          },
+          data: keywords,
         };
       }),
     );
   }
+
+  async getBatches(user: User, params: BatchQueryDto) {
+    const { page = 0, size = 20, order = 'createdDate', sort = SortType.DESC, keyword } = params;
+
+    const entityName = 'batch';
+
+    let query = this.batchRepository.createQueryBuilder(entityName);
+
+    query = this.addKeywordCountQb(query, entityName);
+
+    query.where(`${entityName}.uploaderId = :id`, { id: user.id });
+
+    keyword &&
+      query.andWhere(`lower(${entityName}.originalName) LIKE :keyword`, { keyword: `%${keyword.toLowerCase()}%` });
+
+    const [results, count] = await query
+      .skip(Number(page) * Number(size))
+      .take(Number(size))
+      .orderBy(`${entityName}.${order}`, sort)
+      .getManyAndCount();
+    return new RespWrapper<Batch>(results, count);
+  }
+
+  async getKeywords(user: User, params: KeywordQueryDto) {
+    const { page = 0, size = 20, order = 'createdDate', sort = SortType.DESC, keyword, status, batchId } = params;
+    const entityName = 'keyword';
+    const query = this.keywordRepository
+      .createQueryBuilder(entityName)
+      .leftJoinAndSelect(`${entityName}.batch`, 'batch')
+      .where(`batch.uploaderId = :id`, { id: user.id });
+
+    keyword && query.andWhere(`lower(${entityName}.name) LIKE :keyword`, { keyword: `%${keyword.toLowerCase()}%` });
+    batchId && query.andWhere(`${entityName}.batchId = :batchId`, { batchId });
+
+    if (status) {
+      status === StatusQuery.SUCCESS && query.andWhere(`${entityName}.success IS true`);
+      status === StatusQuery.FAILED && query.andWhere(`${entityName}.success IS false`);
+      status === StatusQuery.PENDING && query.andWhere(`${entityName}.success IS null`);
+    }
+
+    const [results, count] = await query
+      .skip(Number(page) * Number(size))
+      .take(Number(size))
+      .orderBy(`${entityName}.${order}`, sort)
+      .getManyAndCount();
+    return new RespWrapper<Keyword>(results, count);
+  }
+
+  private addKeywordCountQb = (query: SelectQueryBuilder<Batch>, entityName: string) => {
+    return query
+      .loadRelationCountAndMap(`${entityName}.keywordCount`, `${entityName}.keywords`)
+      .loadRelationCountAndMap(`${entityName}.processedCount`, `${entityName}.keywords`, 'keyword', (qb) => {
+        return qb.andWhere('keyword.success IS NOT NULL');
+      });
+  };
 }

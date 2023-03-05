@@ -1,8 +1,8 @@
 import {
   Controller,
-  FileTypeValidator, Param,
+  FileTypeValidator, Get, Param,
   ParseFilePipe,
-  Post, Request,
+  Post, Query, Request,
   Sse,
   UploadedFile,
   UseGuards,
@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
+import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
 import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { FileService } from 'src/services/file.service';
@@ -34,19 +35,35 @@ export class FileController {
     return await this.fileService.saveBatch(file, req.user);
   }
 
-  @Sse('/:batchId')
+  @Get('/batches')
   @UseGuards(JwtAuthGuard)
-  async streamBatchDetail(
+  async getBatches(
     @Request() req,
+    @Query() params: BatchQueryDto,
+  ) {
+    return await this.fileService.getBatches(req.user, params);
+  }
+
+  @Get('/keywords')
+  @UseGuards(JwtAuthGuard)
+  async getKeywords(
+    @Request() req,
+    @Query() params: KeywordQueryDto,
+  ) {
+    return await this.fileService.getKeywords(req.user, params);
+  }
+
+  @Sse('/:batchId')
+  async streamBatchDetail(
     @Param('batchId') batchId: string,
-  ): Promise<Observable<IObservableData<IFileEvent>>> {
-    return await this.fileService.streamBatchDetail(batchId, req.user);
+  ): Promise<Observable<IObservableData<Keyword[]>>> {
+    return await this.fileService.streamBatchDetail(batchId);
   }
 }
-interface IFileEvent {
-  total: number;
-  keywords: Keyword[];
-}
+// interface IFileEvent {
+//   total: number;
+//   keywords: Keyword[];
+// }
 interface IObservableData<T> {
   data: T;
 }

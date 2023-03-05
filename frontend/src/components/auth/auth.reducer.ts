@@ -11,6 +11,7 @@ interface IInitialLoginState {
   loginSuccess: boolean;
   signupSuccess: boolean;
   getProfileSuccess: boolean;
+  isFirstTimeLogin: boolean;
 }
 
 const initialState: IInitialLoginState = {
@@ -21,6 +22,7 @@ const initialState: IInitialLoginState = {
   loginSuccess: false,
   signupSuccess: false,
   getProfileSuccess: false,
+  isFirstTimeLogin: false
 };
 
 const { actions, reducer } = createSlice({
@@ -76,6 +78,7 @@ const { actions, reducer } = createSlice({
       state.user = payload;
       state.signupSuccess = true;
       state.loading = false;
+      state.isFirstTimeLogin = true;      
     },
     [signup.rejected.type]: (state, { payload }: PayloadAction<any>) => {
       localStorage.removeItem(appEnv.TOKEN_LABEL);

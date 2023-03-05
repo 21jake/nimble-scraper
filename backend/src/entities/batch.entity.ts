@@ -13,7 +13,7 @@ export class Batch {
   @Column({ type: 'varchar', length: 100, nullable: false })
   fileName: string;
 
-  @ManyToOne(() => User, (user) => user.batches, { onDelete: 'CASCADE', nullable: false  })
+  @ManyToOne(() => User, (user) => user.batches, { onDelete: 'CASCADE', nullable: false })
   uploader: User;
 
   @OneToMany(() => Keyword, (keyword) => keyword.batch)
@@ -25,4 +25,7 @@ export class Batch {
     nullable: true,
   })
   createdDate: Date;
+
+  keywordCount?: number;
+  processedCount?: number;
 }

@@ -106,7 +106,7 @@ const Register = () => {
                   }) => (
                     <CForm onSubmit={handleSubmit}>
                       <h1>Register</h1>
-                      <p className="text-medium-emphasis">Create your account</p>
+                      <p className="text-medium-emphasis">One click away from the magic</p>
                       <CInputGroup className="mb-3">
                         <CInputGroupText>
                           <CIcon icon={cilUser} />

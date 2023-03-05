@@ -59,7 +59,7 @@ const Upload = () => {
           </CCardHeader>
           <CCardBody>
             <CRow>
-              <CCol xs={6}>
+              <CCol xs={12} lg={6}>
                 <Formik
                   enableReinitialize
                   initialValues={initialValues}
@@ -105,10 +105,10 @@ const Upload = () => {
                 <RecordDetails />
               </CCol>
 
-              <CCol xs={6}>
+              <CCol xs={12} lg={6}>
                 <KeywordDetails keyword={chosenKeyword} />
               </CCol>
-              <CCol xs={12} className={`  mt-3`}>
+              <CCol xs={12} >
                 <KeywordList setChosenKeyword={setChosenKeyword} />
               </CCol>
             </CRow>
@@ -129,7 +129,7 @@ const KeywordDetails = (props: IKeywordDetailsProps) => {
   const htmlHref = keyword?.fileName ? `${appEnv.SERVER_URL}/${keyword.fileName}` : null;
 
   return (
-    <CRow>
+    <CRow >
       <CCol xs={12}>
         <CCard>
           <CCardHeader>
@@ -296,7 +296,7 @@ const RecordDetails = () => {
 
   if (!batch)
     return (
-      <CProgress className="mt-3">
+      <CProgress className="my-3">
         <CProgressBar color="primary" variant="striped" animated value={0} />
       </CProgress>
     );
@@ -304,7 +304,7 @@ const RecordDetails = () => {
   const progress = (Number(batch.processedCount) / Number(batch.keywordCount)) * 100;
   const uploadTime = dayjs.duration({ seconds: time / 1000 }).format('ss');
   return (
-    <CRow>
+    <CRow className={`my-3`}>
       <CCol xs={12}>
         <CProgress className="mt-3">
           <CProgressBar color="primary" variant="striped" animated value={progress || 0} />

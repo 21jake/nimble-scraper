@@ -14,7 +14,7 @@ import {
   CRow,
   CSmartPagination,
   CSmartTable,
-  CTooltip
+  CTooltip,
 } from '@coreui/react-pro';
 import { Formik } from 'formik';
 import { truncate } from 'lodash';
@@ -108,8 +108,6 @@ const KeywordsOverview = (props: ITabPaneProps) => {
   const keywords = useSelector(dashboardSelectors.selectAll);
   const indexedKeywords = createIndexes(keywords, filterState);
 
-
-
   const csvMultipleOption = cacheBatches.map((element) => ({
     value: element.id,
     text: element.originalName,
@@ -139,7 +137,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
         {({ values, handleSubmit, handleBlur, handleChange, setFieldValue, submitForm }) => (
           <CForm className="form-horizontal" onSubmit={handleSubmit}>
             <CRow className="my-2">
-              <CCol xs={3}>
+              <CCol xs={6} lg={3} className={`mt-2`}>
                 <CInputGroup>
                   <CInputGroupText className="bg-white border-end-0">
                     <CIcon icon={cilSearch} />
@@ -156,7 +154,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   />
                 </CInputGroup>
               </CCol>
-              <CCol xs={3} md={2}>
+              <CCol xs={6} lg={3} className={`mt-2`}>
                 <CFormSelect id="status" name="status" onChange={handleChange} value={values.status}>
                   <option value="">Status</option>
                   <option value={'PENDING'}>PENDING</option>
@@ -164,7 +162,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   <option value={'FAILED'}>FAILED</option>
                 </CFormSelect>
               </CCol>
-              <CCol xs={3} >
+              <CCol xs={6} lg={3} className={`mt-2`}>
                 <CMultiSelect
                   key={`CSV${JSON.stringify(csvMultipleOption)}`}
                   placeholder="Select CSV"
@@ -181,7 +179,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                   optionsStyle="text"
                 />
               </CCol>
-              <CCol xs={3} >
+              <CCol xs={6} lg={3} className="d-flex justify-content-end mt-2">
                 <CTooltip content="Clear filter">
                   <CButton
                     color="secondary"
@@ -215,7 +213,9 @@ const KeywordsOverview = (props: ITabPaneProps) => {
           </CForm>
         )}
       </Formik>
-
+      <h5 className={`mt-1 mb-3`}>
+        Total items: <span className="text-info">{totalItems}</span>
+      </h5>
       <CSmartTable
         clickableRows
         columns={columns}

@@ -122,19 +122,19 @@ const CsvOverview = (props: ITabPaneProps) => {
                 />
               </CInputGroup>
             </CCol>
-            <CCol xs={6}>
+            <CCol xs={6} className="d-flex justify-content-end ">
               <CTooltip content="Clear filter">
-              <CButton
-                color="secondary"
-                variant="outline"
-                className={` me-3 border-0`}
-                onClick={() => {
-                  setFieldValue('keyword', '');
-                  submitForm();
-                }}
-              >
-                <CIcon icon={cilFilterX} />
-              </CButton>
+                <CButton
+                  color="secondary"
+                  variant="outline"
+                  className={` me-3 border-0`}
+                  onClick={() => {
+                    setFieldValue('keyword', '');
+                    submitForm();
+                  }}
+                >
+                  <CIcon icon={cilFilterX} />
+                </CButton>
               </CTooltip>
               <CTooltip content="Reload table">
                 <CButton
@@ -153,6 +153,9 @@ const CsvOverview = (props: ITabPaneProps) => {
           </CForm>
         )}
       </Formik>
+      <h5 className={`mt-1 mb-3`}>
+        Total items: <span className="text-info">{totalItems}</span>
+      </h5>
       <CSmartTable
         clickableRows
         columns={columns}

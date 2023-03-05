@@ -51,4 +51,5 @@ export const tableProps: CTableProps = {
   hover: true,
   align: 'middle',
   bordered: true,
+  responsive: 'xl'
 };

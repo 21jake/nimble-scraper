@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import { RootState } from 'src/reducers';
 import { useRouter } from 'src/utils/hooks';
 import TheHeader from '../containers/TheHeader';
+import Welcome from './Welcome';
 
 const Overview = React.lazy(() => import('src/components/dashboard/overview'));
 const Upload = React.lazy(() => import('src/components/dashboard/upload/Upload'));
@@ -17,20 +18,19 @@ const loading = (
   </div>
 );
 
-interface Dashboard {}
-
-const Dashboard = ({}: Dashboard) => {
-  const { user } = useSelector((state: RootState) => state.authentication);
+const Dashboard = () => {
+  const { user, isFirstTimeLogin } = useSelector((state: RootState) => state.authentication);
   const { navigate } = useRouter();
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
+    if (!user) return navigate('/');
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
   return (
     <div>
+      <Welcome isFirstTime={isFirstTimeLogin} />
       <div className="wrapper d-flex flex-column min-vh-100 bg-light">
         <TheHeader />
         <div className="body flex-grow-1 px-3">

@@ -1,33 +1,15 @@
-import { cilExternalLink } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
 import {
-  CBadge,
-  CButton,
-  CCol,
-  CLink,
   CNav,
   CNavItem,
-  CNavLink,
-  CRow,
-  CSmartTable,
-  CTabContent,
-  CTabPane,
-  CTooltip,
+  CNavLink, CTabContent,
+  CTabPane
 } from '@coreui/react-pro';
-import dayjs from 'dayjs';
 import { useState } from 'react';
-import { appEnv } from 'src/config/constants';
-import { IBatch } from 'src/models/batch.model';
-import { IKeyword } from 'src/models/keyword.model';
-import { batches, keywords } from '../data';
 import CsvOverview from './CsvOverview';
 import KeywordsOverview from './KeywordsOverview';
 
-interface IOverviewProps {}
 
-console.log({ batches });
-
-const Overview = ({}: IOverviewProps) => {
+const Overview = () => {
   const [activeKey, setActiveKey] = useState<number>(1);
   const [batchId, setBatchId] = useState<number>();
 

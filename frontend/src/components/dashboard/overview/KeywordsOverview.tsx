@@ -95,7 +95,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
   });
 
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { totalItems, cacheBatches, loading } = initialState;
+  const { totalItems, cacheBatches } = initialState;
   const totalPages = Math.ceil(totalItems / filterState.size);
 
   const handlePaginationChange = (page: number) => {

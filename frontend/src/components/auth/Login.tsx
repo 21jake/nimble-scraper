@@ -12,7 +12,7 @@ import {
   CFormInput,
   CInputGroup,
   CInputGroupText,
-  CRow,
+  CRow
 } from '@coreui/react-pro';
 import { Formik } from 'formik';
 import React, { useEffect } from 'react';
@@ -36,10 +36,10 @@ const initialValues: ILogin = {
 };
 
 const Login = () => {
-  const { navigate, location, redirectView } = useRouter();
+  const { navigate } = useRouter();
   const dispatch = useDispatch();
 
-  const { errorMessage, user, loading } = useSelector((state: RootState) => state.authentication);
+  const { errorMessage, user } = useSelector((state: RootState) => state.authentication);
 
   useEffect(() => {
     if (user) {

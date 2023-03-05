@@ -9,7 +9,6 @@ import {
   CForm,
   CFormFeedback,
   CFormInput,
-  CFormLabel,
   CImage,
   CLink,
   CProgress,
@@ -17,20 +16,24 @@ import {
   CRow,
 } from '@coreui/react-pro';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import { Formik } from 'formik';
 import { truncate } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import CsvImg from 'src/assets/img/csv-icon.png';
 import InfoLoader from 'src/components/shared/InfoLoader';
 import { appEnv } from 'src/config/constants';
 import { IKeyword } from 'src/models/keyword.model';
 import { RootState } from 'src/reducers';
 import { checkIfFileIsCsv, getKeywordStatus } from 'src/utils/helpers';
+import { useStopWatch } from 'src/utils/hooks';
 import * as Yup from 'yup';
 import { IUploadFile, uploadCsv } from '../dashboard.api';
 import { fetching, setKwProcessedCount, streaming } from '../dashboard.reducer';
 import { statusBadge } from '../overview/KeywordsOverview';
-import CsvImg from 'src/assets/img/csv-icon.png';
+
+dayjs.extend(duration);
 
 const initialValues: IUploadFile = {
   file: undefined,
@@ -43,7 +46,7 @@ const validationSchema = Yup.object().shape({
 const Upload = () => {
   const dispatch = useDispatch();
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { batch, uploadSuccess, streaming } = initialState;
+  const { streaming } = initialState;
 
   const [chosenKeyword, setChosenKeyword] = useState<IKeyword | null>(null);
 
@@ -94,7 +97,7 @@ const Upload = () => {
                       </CFormFeedback>
 
                       <CButton className={`mt-3`} variant="outline" type="submit" disabled={streaming}>
-                        Submit
+                        Upload
                       </CButton>
                     </CForm>
                   )}
@@ -208,30 +211,25 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
   const { initialState } = useSelector((state: RootState) => state.dashboard);
   const { batch } = initialState;
   const [keywords, setKeywords] = useState<IKeyword[]>([]);
-  // const keywordz = useSelector(dashboardSelectors.selectAll);
 
   useEffect(() => {
-    console.log('UEH works');
     if (batch) {
       dispatch(streaming(true));
       const eventSource = new EventSource(`${appEnv.SERVER_API_URL}/file/${batch.id}`);
       eventSource.onmessage = (e) => {
         const kws: IKeyword[] = JSON.parse(e.data);
-        console.log(kws);
         setKeywords(kws);
 
         const totalCompleted = kws.filter((kw) => kw.success !== null).length;
         dispatch(setKwProcessedCount(totalCompleted));
 
         if (totalCompleted === batch.keywordCount) {
-          console.log('CLOSE EVENT SOURCE');
           dispatch(streaming(false));
           eventSource.close();
         }
       };
-
-      // if (batch.status === 'completed') {}
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [batch]);
 
   return (
@@ -283,7 +281,18 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
 
 const RecordDetails = () => {
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { batch, uploadSuccess } = initialState;
+
+  const { start, stop, time } = useStopWatch();
+
+  const { batch, streaming } = initialState;
+
+  useEffect(() => {
+    if (streaming) {
+      start();
+    } else {
+      stop();
+    }
+  }, [streaming, start, stop]);
 
   if (!batch)
     return (
@@ -293,7 +302,7 @@ const RecordDetails = () => {
     );
 
   const progress = (Number(batch.processedCount) / Number(batch.keywordCount)) * 100;
-
+  const uploadTime = dayjs.duration({ seconds: time / 1000 }).format('ss');
   return (
     <CRow>
       <CCol xs={12}>
@@ -313,6 +322,11 @@ const RecordDetails = () => {
         <p>
           <span className={`fw-semibold`}> Uploaded:</span>{' '}
           {`${dayjs(batch?.createdDate).format(appEnv.APP_DATE_FORMAT)}`}
+        </p>
+      </CCol>
+      <CCol xs={6}>
+        <p>
+          <span className={`fw-semibold`}> Time:</span> {`${uploadTime} s`}
         </p>
       </CCol>
     </CRow>

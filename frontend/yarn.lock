@@ -1068,6 +1068,13 @@
     "@coreui/coreui" "4.0.0"
     chart.js "^3.4.0"
 
+"@coreui/coreui-pro@^4.4.3":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@coreui/coreui-pro/-/coreui-pro-4.4.3.tgz#32a445e4d30926895e4b047ef24aa371ddeee24c"
+  integrity sha512-cMhDq6QIBvT20sr5n6m16w/rk3gctpu9zAfkHcRxQInXF4nvfPx8n2iRLvi852NcPJ4jgJhBYWLDC/99Y7Gsig==
+  dependencies:
+    postcss-combine-duplicated-selectors "^10.0.3"
+
 "@coreui/coreui@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@coreui/coreui/-/coreui-4.0.0.tgz#52ebe0197411a829ba48057ade61923e05859eec"

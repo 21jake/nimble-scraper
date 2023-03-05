@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@coreui/coreui": "^4.2.6",
+    "@coreui/coreui-pro": "^4.4.3",
     "@coreui/icons": "^2.1.0",
     "@coreui/icons-react": "^2.1.0",
     "@coreui/react": "^4.6.0",

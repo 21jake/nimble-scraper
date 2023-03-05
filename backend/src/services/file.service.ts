@@ -108,7 +108,7 @@ export class FileService {
 
     query.where(`${entityName}.uploaderId = :id`, { id: user.id });
 
-    keyword && query.andWhere(`${entityName}.originalName LIKE :keyword`, { keyword: `%${keyword}%` });
+    keyword && query.andWhere(`lower(${entityName}.originalName) LIKE :keyword`, { keyword: `%${keyword.toLowerCase()}%` });
 
     const [results, count] = await query
       .skip(Number(page) * Number(size))
@@ -126,7 +126,7 @@ export class FileService {
       .leftJoinAndSelect(`${entityName}.batch`, 'batch')
       .where(`batch.uploaderId = :id`, { id: user.id });
 
-    keyword && query.andWhere(`${entityName}.name LIKE :keyword`, { keyword: `%${keyword}%` });
+    keyword && query.andWhere(`lower(${entityName}.name) LIKE :keyword`, { keyword: `%${keyword.toLowerCase()}%` });
     batchId && query.andWhere(`${entityName}.batchId = :batchId`, { batchId });
 
     if (status) {

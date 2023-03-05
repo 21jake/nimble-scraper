@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import { RootState } from 'src/reducers';
 import { useRouter } from 'src/utils/hooks';
-import TheHeader from '../containers/TheHeader';
+import TheHeader from '../shared/TheHeader';
 import Welcome from './Welcome';
 
 const Overview = React.lazy(() => import('src/components/dashboard/overview'));
-const Upload = React.lazy(() => import('src/components/dashboard/upload/Upload'));
+const Upload = React.lazy(() => import('src/components/dashboard/upload'));
 const Page404 = React.lazy(() => import('src/components/shared/Page404'));
 
 // const TheLayout = React.lazy(() => import('src/components/containers/TheLayout'));

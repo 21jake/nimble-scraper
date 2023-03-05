@@ -1,9 +1,8 @@
 import { cilAccountLogout } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { CButton, CContainer, CHeader, CHeaderNav, CNavItem } from '@coreui/react-pro';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'src/utils/hooks';
-import { RootState } from '../../reducers';
 import { logout } from '../auth/auth.reducer';
 
 const TheHeader = () => {

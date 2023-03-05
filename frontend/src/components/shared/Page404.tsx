@@ -1,6 +1,4 @@
-import { cilMagnifyingGlass } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
-import { CButton, CCol, CContainer, CFormInput, CImage, CInputGroup, CInputGroupText, CRow } from '@coreui/react-pro';
+import { CCol, CContainer, CImage, CRow } from '@coreui/react-pro';
 import notFoundImg from 'src/assets/img/404.png';
 import { useRouter } from 'src/utils/hooks';
 

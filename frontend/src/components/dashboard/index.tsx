@@ -6,8 +6,8 @@ import { RootState } from 'src/reducers';
 import { useRouter } from 'src/utils/hooks';
 import TheHeader from '../containers/TheHeader';
 
-const Overview = React.lazy(() => import('src/components/dashboard/Overview'));
-const Upload = React.lazy(() => import('src/components/dashboard/Upload'));
+const Overview = React.lazy(() => import('src/components/dashboard/overview'));
+const Upload = React.lazy(() => import('src/components/dashboard/upload/Upload'));
 const Page404 = React.lazy(() => import('src/components/shared/Page404'));
 
 // const TheLayout = React.lazy(() => import('src/components/containers/TheLayout'));

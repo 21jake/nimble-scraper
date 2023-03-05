@@ -21,9 +21,9 @@ import { IKeyword } from 'src/models/keyword.model';
 import { RootState } from 'src/reducers';
 import { checkIfFileIsCsv } from 'src/utils/helpers';
 import * as Yup from 'yup';
-import { IUploadFile, uploadCsv } from './dashboard.api';
-import { fetching } from './dashboard.reducer';
-import { keywords } from './data';
+import { IUploadFile, uploadCsv } from '../dashboard.api';
+import { fetching } from '../dashboard.reducer';
+import { keywords } from '../data';
 
 
 interface IUploadProps {}
@@ -38,7 +38,8 @@ const validationSchema = Yup.object().shape({
 
 const Upload = () => {
   const dispatch = useDispatch();
-  const { errorMessage, batch, uploadSuccess } = useSelector((state: RootState) => state.fileUpload);
+  const { initialState } = useSelector((state: RootState) => state.dashboard);
+  const { batch, uploadSuccess } = initialState;
 
   useEffect(() => {
     console.log({ batch, uploadSuccess });

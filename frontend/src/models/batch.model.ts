@@ -10,4 +10,6 @@ export interface IBatch {
     // uploader?: IUser
     // createdDate: Date;
     createdDate: Date | string;
+    keywordCount?: number;
+    processedCount?: number;
 }

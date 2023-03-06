@@ -2,8 +2,9 @@ import { cilAccountLogout } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { CButton, CContainer, CHeader, CHeaderNav, CNavItem } from '@coreui/react-pro';
 import { useDispatch } from 'react-redux';
-import { useRouter } from 'src/utils/hooks';
-import { logout } from '../auth/auth.reducer';
+import { useRouter } from 'src/utils/hooks/useRouter';
+import { logout, resetAll as resetAuth } from '../auth/auth.reducer';
+import { resetAll as resetDashboard } from '../dashboard/dashboard.reducer';
 
 const TheHeader = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,8 @@ const TheHeader = () => {
 
   const onLogout = () => {
     dispatch(logout());
+    dispatch(resetAuth())
+    dispatch(resetDashboard())
   };
 
   return (

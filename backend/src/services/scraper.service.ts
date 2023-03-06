@@ -14,6 +14,7 @@ import { appEnv } from 'src/configs/config';
 import useProxy from 'puppeteer-page-proxy';
 import { sleep } from 'src/utils/helpers';
 import { chunk } from 'lodash';
+import { FileService } from './file.service';
 
 
 @Injectable()
@@ -24,10 +25,13 @@ export class ScraperService {
 
     @Inject(Repositories.KEYWORD_REPOSITORY)
     private keywordRepository: Repository<Keyword>,
+
+    private fileService: FileService
   ) {}
 
   @OnEvent(EmittedEvent.NEW_BATCH)
   async scrape(payload: Batch) {
+    this.fileService.concurrentUploadCount++;
     const browser = await puppeteer.launch();
     const keywords = await this.keywordRepository.find({ where: { batch: { id: payload.id } }, select: ['id'] });
     const kwChunks = chunk(keywords, appEnv.CHUNK_SIZE); 
@@ -41,6 +45,10 @@ export class ScraperService {
       await sleep(appEnv.DELAY_BETWEEN_CHUNK_MS);
 
     }
+    await browser.close();
+
+    this.fileService.concurrentUploadCount--;
+
   }
 
   private async handleKeywordChunk(kwChunk: Keyword[], browser: Browser) {
@@ -99,4 +107,5 @@ export class ScraperService {
     console.log({ savedKeword: saved });
     await page.close();
   }
+
 }

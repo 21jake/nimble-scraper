@@ -18,7 +18,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastError, ToastSuccess } from 'src/components/shared/Toast';
 import { RootState } from 'src/reducers';
-import { useRouter } from 'src/utils/hooks';
+import { useRouter } from 'src/utils/hooks/useRouter';
 import * as Yup from 'yup';
 import { ISignup, signup } from './auth.api';
 import { fetching, partialReset, resetAll } from './auth.reducer';
@@ -52,7 +52,7 @@ const validationSchema = Yup.object().shape({
 const Register = () => {
   const { navigate } = useRouter();
   const dispatch = useDispatch();
-  const { errorMessage, signupSuccess, user } = useSelector((state: RootState) => state.authentication);
+  const { errorMessage, signupSuccess, user, loading } = useSelector((state: RootState) => state.authentication);
 
   useEffect(() => {
     if (user) {
@@ -60,7 +60,6 @@ const Register = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-
 
   useEffect(() => {
     if (errorMessage) {
@@ -95,15 +94,7 @@ const Register = () => {
                     dispatch(signup(values));
                   }}
                 >
-                  {({
-                    isSubmitting,
-                    values,
-                    errors,
-                    touched,
-                    handleBlur,
-                    handleSubmit,
-                    setFieldValue,
-                  }) => (
+                  {({ isSubmitting, values, errors, touched, handleBlur, handleSubmit, setFieldValue }) => (
                     <CForm onSubmit={handleSubmit}>
                       <h1>Register</h1>
                       <p className="text-medium-emphasis">One click away from the magic</p>
@@ -173,10 +164,16 @@ const Register = () => {
                         </CFormFeedback>
                       </CInputGroup>
 
-                      <div className="d-grid">
-                        <CButton color="success" type="submit" disabled={isSubmitting}>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <CButton color="primary" type="submit" disabled={loading}>
                           Create Account
                         </CButton>
+                        <span>
+                          Already have an account?{' '}
+                          <span onClick={() => navigate('/')} className={`text-info cursor-pointer`}>
+                            Login
+                          </span>{' '}
+                        </span>
                       </div>
                     </CForm>
                   )}

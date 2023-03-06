@@ -7,7 +7,8 @@ import {
   CCol,
   CForm,
   CFormFeedback,
-  CFormInput, CRow
+  CFormInput,
+  CRow,
 } from '@coreui/react-pro';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -20,6 +21,7 @@ import { checkIfFileIsCsv } from 'src/utils/helpers';
 import * as Yup from 'yup';
 import { IUploadFile, uploadCsv } from '../dashboard.api';
 import { fetching } from '../dashboard.reducer';
+import FormatGuide from './FormatGuide';
 import KeywordDetails from './KeywordDetails';
 import KeywordList from './KeywordList';
 import RecordDetails from './RecordDetails';
@@ -41,8 +43,12 @@ const Upload = () => {
 
   const [chosenKeyword, setChosenKeyword] = useState<IKeyword | null>(null);
 
+  const [guideVisible, setGuideVisible] = useState(false);
+  const popupGuide = () => setGuideVisible(true);
+
   return (
     <CRow>
+      <FormatGuide visible={guideVisible} setVisible={setGuideVisible} />
       <CCol xs={12}>
         <CCard>
           <CCardHeader>
@@ -86,8 +92,11 @@ const Upload = () => {
                       <CFormFeedback invalid className={!!errors.file && touched.file ? 'd-block' : 'd-none'}>
                         {errors.file}
                       </CFormFeedback>
-
-                      <CButton className={`mt-3`} variant="outline" type="submit" disabled={streaming}>
+                      <p className="text-medium-emphasis small mt-1">
+                        Take a look at the <span className="text-info cursor-pointer" onClick={popupGuide}>CSV file format</span> to ensure
+                        everything works as expected.
+                      </p>
+                      <CButton variant="outline" type="submit" disabled={streaming}>
                         Upload
                       </CButton>
                     </CForm>

@@ -3,7 +3,7 @@ import CsvImg from 'src/assets/img/csv-icon.png';
 import CIcon from '@coreui/icons-react';
 import { CButton, CCard, CCardBody, CCardHeader, CCardTitle, CCol, CImage, CRow } from '@coreui/react-pro';
 import { truncate } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appEnv } from 'src/config/constants';
 import { IKeyword } from 'src/models/keyword.model';
@@ -20,15 +20,17 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
   const { initialState } = useSelector((state: RootState) => state.dashboard);
   const { batch } = initialState;
   const [keywords, setKeywords] = useState<IKeyword[]>([]);
+  const mountedRef = useRef(true)
 
   useEffect(() => {
     if (batch) {
       dispatch(streaming(true));
       const eventSource = new EventSource(`${appEnv.SERVER_API_URL}/file/${batch.id}`);
       eventSource.onmessage = (e) => {
+
+        if (!mountedRef.current) return null
         const kws: IKeyword[] = JSON.parse(e.data);
         setKeywords(kws);
-
         const totalCompleted = kws.filter((kw) => kw.success !== null).length;
         dispatch(setKwProcessedCount(totalCompleted));
 
@@ -40,6 +42,12 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [batch]);
+
+  useEffect(() => {
+    return () => { 
+      mountedRef.current = false
+    }
+  }, [])
 
   return (
     <CRow className={`mt-3`}>

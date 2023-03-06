@@ -16,6 +16,7 @@ services:
       context: .
       dockerfile: ./backend/Dockerfile
   frontend:
+    platform: linux/amd64
     restart: always
     build:
       context: .

@@ -1,5 +1,6 @@
 FROM node:18-alpine as Builder
 COPY ../frontend /app/
+ENV REACT_APP_BACKEND_HOST='165.22.98.13'
 RUN cd /app && yarn && yarn run build
 
 FROM nginx:1.22-alpine as Production

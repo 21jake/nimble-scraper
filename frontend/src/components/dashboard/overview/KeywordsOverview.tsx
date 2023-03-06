@@ -132,7 +132,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
       <Formik
         enableReinitialize
         initialValues={filterState}
-        onSubmit={(values) => setFilterState({ ...filterState, ...values })}
+        onSubmit={(values) => setFilterState({ ...filterState, ...values, page: 0 })}
       >
         {({ values, handleSubmit, handleBlur, handleChange, setFieldValue, submitForm }) => (
           <CForm className="form-horizontal" onSubmit={handleSubmit}>

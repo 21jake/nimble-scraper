@@ -100,7 +100,7 @@ const CsvOverview = (props: ITabPaneProps) => {
         enableReinitialize
         initialValues={filterState}
         onSubmit={(values) => {
-          setFilterState({ ...filterState, ...values });
+          setFilterState({ ...filterState, ...values, page: 0 });
         }}
       >
         {({ values, handleSubmit, handleBlur, handleChange, setFieldValue, submitForm }) => (

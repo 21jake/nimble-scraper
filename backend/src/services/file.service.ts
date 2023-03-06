@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   MessageEvent,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -35,7 +36,14 @@ export class FileService {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  public concurrentUploadCount = 0;
+
   public async saveBatch(file: Express.Multer.File, user: User) {
+
+    if (this.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
+      throw new ServiceUnavailableException(ErrorResponses.MAX_CONCURRENT_UPLOAD);
+    }
+    
     const batch = new Batch();
     batch.uploader = user;
     batch.originalName = file.originalname;

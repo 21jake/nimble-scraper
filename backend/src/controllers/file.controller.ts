@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   FileTypeValidator, Get, Param,
   ParseFilePipe,
@@ -60,10 +61,6 @@ export class FileController {
     return await this.fileService.streamBatchDetail(batchId);
   }
 }
-// interface IFileEvent {
-//   total: number;
-//   keywords: Keyword[];
-// }
 interface IObservableData<T> {
   data: T;
 }

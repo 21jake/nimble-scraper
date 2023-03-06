@@ -11,6 +11,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=dev
       - TZ=Asia/Ho_Chi_Minh
+      - POSTGRESQL_TIMEZONE=Asia/Ho_Chi_Minh
   backend:
     image: jake21/scraper-backend
     env_file:

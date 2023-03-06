@@ -18,7 +18,8 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - './volumes/backend-storage/:/backend/storage'
+      - './volumes/backend-storage/csv:/backend/storage/csv'
+      - './volumes/backend-storage/html:/backend/storage/html'
 
 volumes:
   scraper-db:

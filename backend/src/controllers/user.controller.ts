@@ -7,11 +7,6 @@ import { UserService } from 'src/services/user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/')
-  async findAll() {
-    return await this.userService.findAll();
-  }
-
   @Post('/signup')
   async create(@Body() dto: SignUpDto) {
     return await this.userService.create(dto);

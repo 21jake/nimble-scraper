@@ -4,3 +4,4 @@
 /volumes/backend-storage
 /backend/storage/*
 /backend/.cache
+/backend/coverage

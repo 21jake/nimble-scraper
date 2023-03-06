@@ -10,6 +10,7 @@ services:
       - POSTGRES_PASSWORD=Zv2kEX
       - POSTGRES_USER=postgres
       - POSTGRES_DB=dev
+      - TZ=Asia/Ho_Chi_Minh
   backend:
     env_file:
       - ./backend/.env.dev

@@ -12,6 +12,7 @@ services:
       - POSTGRES_DB=dev
       - TZ=Asia/Ho_Chi_Minh
   backend:
+    image: 21jake/scraper-backend
     env_file:
       - ./backend/.env.dev
     ports:

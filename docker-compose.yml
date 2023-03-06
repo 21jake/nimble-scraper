@@ -16,10 +16,10 @@ services:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
-  frontend:
-    image: boilerplate/frontend
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    ports:
-      - "3000:80"
+  # frontend:
+  #   image: boilerplate/frontend
+  #   build:
+  #     context: .
+  #     dockerfile: ./frontend/Dockerfile
+  #   ports:
+  #     - "3000:80"

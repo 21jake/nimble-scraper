@@ -23,7 +23,7 @@ const FormatGuide = ({visible, setVisible}: IFormatGuideProps) => {
             2. Each keyword is separated by a <code>linebreak</code>{' '}
           </p>
           <p className="mb-2">
-            3. Number of keywords can range  <code>from 1 to more than 300</code>{' '}
+            3. Number of keywords can range  <code>from 1 to more than 100</code>{' '}
           </p>
           <p className="mb-2">4. Below is an example file with <code>4 keywords</code> </p>
 

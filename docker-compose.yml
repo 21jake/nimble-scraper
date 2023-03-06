@@ -16,6 +16,7 @@ services:
       context: .
       dockerfile: ./backend/Dockerfile
   frontend:
+    restart: always
     build:
       context: .
       dockerfile: ./frontend/Dockerfile

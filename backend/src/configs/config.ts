@@ -13,7 +13,7 @@ const CSV_PATH = path.join(STORAGE_PATH, '/csv');
 const PROXY_FILE_PATH = path.join(__dirname, '../..', '/proxies.json');
 
 const proxiesCount = Number(JSON.parse(readFileSync(PROXY_FILE_PATH, 'utf-8')).length);
-const CHUNK_SIZE = 3 // Number of keywords scraped at a time
+const CHUNK_SIZE = 4 // Number of keywords scraped at a time
 
 export const appEnv = {
   APP_PORT: Number(APP_PORT),
@@ -29,7 +29,7 @@ export const appEnv = {
   CSV_PATH,
   PROXY_FILE_PATH,
   CHUNK_SIZE,
-  DELAY_BETWEEN_CHUNK_MS: 5_000,
+  DELAY_BETWEEN_CHUNK_MS: 4_000,
   PAGE_TIMEOUT_MS: 10_000,
   MAX_CONCURRENT_UPLOAD: Math.round(proxiesCount / CHUNK_SIZE) - 1
 };

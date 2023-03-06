@@ -43,6 +43,7 @@ const { actions, reducer } = createSlice({
       state.token = undefined;
       state.loginSuccess = false;
       state.signupSuccess = false;
+      state.isFirstTimeLogin = false
     },
     partialReset(state) {
       state.loading = false;

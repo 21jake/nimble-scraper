@@ -1,6 +1,6 @@
 import { CCol, CContainer, CImage, CRow } from '@coreui/react-pro';
 import notFoundImg from 'src/assets/img/404.png';
-import { useRouter } from 'src/utils/hooks';
+import { useRouter } from 'src/utils/hooks/useRouter';
 
 const Page404 = () => {
   const { navigate } = useRouter();

@@ -1,6 +1,6 @@
 import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CBadge } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'src/utils/hooks';
+import { useRouter } from 'src/utils/hooks/useRouter';
 
 interface IWelcomeProps {
   isFirstTime: boolean;

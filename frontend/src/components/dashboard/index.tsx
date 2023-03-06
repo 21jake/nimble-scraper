@@ -3,7 +3,7 @@ import React, { Suspense, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import { RootState } from 'src/reducers';
-import { useRouter } from 'src/utils/hooks';
+import { useRouter } from 'src/utils/hooks/useRouter';
 import TheHeader from '../shared/TheHeader';
 import Welcome from './Welcome';
 

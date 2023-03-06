@@ -52,6 +52,7 @@ const { actions, reducer } = createSlice({
       state.initialState.fetchEntitiesSuccess = false;
       state.initialState.totalItems = 0;
       state.initialState.cacheBatches = [];
+      state.initialState.streaming = false;
     },
     setKwProcessedCount(state, {payload}: PayloadAction<number>) {
       if (!state.initialState.batch) return;

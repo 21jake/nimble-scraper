@@ -5,17 +5,24 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - './volumes/postgresql/:/bitnami/postgresql'
+      - scraper-db:/bitnami/postgresql
     environment:
       - POSTGRES_PASSWORD=Zv2kEX
       - POSTGRES_USER=postgres
       - POSTGRES_DB=dev
       - TZ=Asia/Ho_Chi_Minh
+      - POSTGRESQL_TIMEZONE=Asia/Ho_Chi_Minh
   backend:
+    image: jake21/scraper-backend
     env_file:
       - ./backend/.env.dev
     ports:
       - 5000:5000
     volumes:
-      - './volumes/backend-storage/:/backend/storage'
+      - './volumes/backend-storage:/app/storage'
+  frontend:
+    image: jake21/scraper-frontend
 
+volumes:
+  scraper-db:
+    name: scraper-db

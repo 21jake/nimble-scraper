@@ -10,16 +10,16 @@ services:
     ports:
       - 8080:8080
   backend:
-    image: boilerplate/backend
     platform: linux/amd64
     restart: unless-stopped
     build:
       context: .
       dockerfile: ./backend/Dockerfile
   frontend:
-    image: boilerplate/frontend
+    platform: linux/amd64
+    restart: always
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - "3000:80"
+      - "80:80"

@@ -32,7 +32,10 @@ export class ScraperService {
   @OnEvent(EmittedEvent.NEW_BATCH)
   async scrape(payload: Batch) {
     this.fileService.concurrentUploadCount++;
-    const browser = await puppeteer.launch();
+
+    const args = appEnv.IS_PROD ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
+
+    const browser = await puppeteer.launch({args});
     const keywords = await this.keywordRepository.find({ where: { batch: { id: payload.id } }, select: ['id'] });
     const kwChunks = chunk(keywords, appEnv.CHUNK_SIZE); 
 

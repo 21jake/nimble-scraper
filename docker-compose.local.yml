@@ -12,6 +12,7 @@ services:
       - POSTGRES_DB=local
       - TZ=Asia/Ho_Chi_Minh
   backend:
+    image: boilerplate/backend
     env_file:
       - ./backend/.env
     environment:

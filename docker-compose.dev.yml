@@ -5,7 +5,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - './volumes/postgresql/:/bitnami/postgresql'
+      - scraper-db:/bitnami/postgresql
     environment:
       - POSTGRES_PASSWORD=Zv2kEX
       - POSTGRES_USER=postgres
@@ -20,3 +20,6 @@ services:
     volumes:
       - './volumes/backend-storage/:/backend/storage'
 
+volumes:
+  scraper-db:
+    name: scraper-db

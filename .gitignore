@@ -1,7 +1,9 @@
 */node_modules
 /backend/dist
 /volumes/postgresql
-/volumes/backend-storage
+/volumes/backend-storage/html/*
+!/volumes/backend-storage/html/index.html
+/volumes/backend-storage/csv/*
 /backend/storage/*
 /backend/.cache
 /backend/coverage

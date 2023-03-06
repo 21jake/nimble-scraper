@@ -4,7 +4,7 @@ import * as path from 'path';
 
 dotenv.config();
 
-const { APP_PORT, DATABASE_NAME, DATABASE_PORT, DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, JWT_KEY } =
+const { APP_PORT, DATABASE_NAME, DATABASE_PORT, DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, JWT_KEY, NODE_ENV } =
   process.env;
 
 const STORAGE_PATH = path.join(__dirname, '../..', '/storage');
@@ -17,6 +17,7 @@ const CHUNK_SIZE = 3 // Number of keywords scraped at a time
 
 export const appEnv = {
   APP_PORT: Number(APP_PORT),
+  IS_PROD: NODE_ENV === 'prod',
   DATABASE_NAME,
   DATABASE_PORT: Number(DATABASE_PORT),
   DATABASE_USER,

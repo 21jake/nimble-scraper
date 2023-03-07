@@ -11,8 +11,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=local
       - TZ=Asia/Ho_Chi_Minh
+      - POSTGRESQL_TIMEZONE=Asia/Ho_Chi_Minh
   backend:
-    image: boilerplate/backend
     env_file:
       - ./backend/.env
     environment:
@@ -21,7 +21,3 @@ services:
       - 5000:5000
     volumes:
       - './volumes/backend-storage/:/backend/storage'
-  frontend:
-      image: jake21/scraper-frontend
-      ports:
-      - "80:80"

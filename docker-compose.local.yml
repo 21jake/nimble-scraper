@@ -21,3 +21,7 @@ services:
       - 5000:5000
     volumes:
       - './volumes/backend-storage/:/backend/storage'
+  frontend:
+      image: jake21/scraper-frontend
+      ports:
+      - "80:80"

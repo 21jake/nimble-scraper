@@ -20,8 +20,14 @@ services:
       - 5000:5000
     volumes:
       - './volumes/backend-storage:/app/storage'
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
   frontend:
     image: jake21/scraper-frontend
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile.dev
 
 volumes:
   scraper-db:

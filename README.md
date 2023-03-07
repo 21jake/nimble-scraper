@@ -7,7 +7,7 @@ The tool: http://skrape.site/
 - Deployment: Git, Docker, Compose.
 - Test: Jest (~80% coverage)
 
-Upload CSV will get their keywords parsed. Keywords are divided into chunks of three, which means **3** keywords are scraped at a time. Increasing this chunk size leads to more frequent errors. Scraped results are streamed back to frontend using Server-sent events.
+Uploaded CSV will get their keywords parsed. Keywords are divided into chunks of three, which means **3** keywords are scraped at a time. Increasing this chunk size leads to more frequent errors. Scraped results are streamed back to frontend using Server-sent events.
 
 I use static proxies rotating for each request to bypass Google mass searching detection. To ensure the longevity of the proxies, a delay is needed between each chunk.
 

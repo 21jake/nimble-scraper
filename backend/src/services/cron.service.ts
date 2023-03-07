@@ -25,7 +25,7 @@ export class CronService {
     private fileService: FileService,
   ) {}
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async reScrape() {
     console.log('Running cron job...');
     if (this.fileService.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {

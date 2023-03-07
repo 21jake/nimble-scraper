@@ -13,7 +13,6 @@ import { pickLeastUsedProxy, SinglePageManipulator } from 'src/utils/scraper.uti
 import { Repository } from 'typeorm';
 import { FileService } from './file.service';
 
-
 @Injectable()
 export class ScraperService {
   constructor(
@@ -23,7 +22,7 @@ export class ScraperService {
     @Inject(Repositories.KEYWORD_REPOSITORY)
     private keywordRepository: Repository<Keyword>,
 
-    private fileService: FileService
+    private fileService: FileService,
   ) {}
 
   @OnEvent(EmittedEvent.NEW_BATCH)
@@ -32,26 +31,25 @@ export class ScraperService {
 
     const args = appEnv.IS_PROD ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
 
-    const browser = await puppeteer.launch({args});
+    const browser = await puppeteer.launch({ args });
     const keywords = await this.keywordRepository.find({ where: { batch: { id: payload.id } }, select: ['id'] });
-    const kwChunks = chunk(keywords, appEnv.CHUNK_SIZE); 
+    const kwChunks = chunk(keywords, appEnv.CHUNK_SIZE);
 
     for (let index = 0; index < kwChunks.length; index++) {
-
       const kwChunk = kwChunks[index];
       await this.handleKeywordChunk(kwChunk, browser);
 
       // To ensure the longevity of the proxies, a delay is needed between each chunk
       await sleep(appEnv.DELAY_BETWEEN_CHUNK_MS);
-
     }
+
+    await sleep(1000);
     await browser.close();
 
     this.fileService.concurrentUploadCount--;
-
   }
 
-  private async handleKeywordChunk(kwChunk: Keyword[], browser: Browser) {
+  public async handleKeywordChunk(kwChunk: Keyword[], browser: Browser) {
     console.log('Working on new chunk...');
 
     const scrapeKeywordPromises = kwChunk.map((kw) => this.scrapeKeyword(kw.id, browser));
@@ -63,7 +61,7 @@ export class ScraperService {
   private async scrapeKeyword(keywordId: number, browser: Browser) {
     const keywordRecord = await this.keywordRepository.findOne({ where: { id: keywordId } });
     const keyword = keywordRecord.name.replaceAll(' ', '+');
-    const {url: proxy, label: proxyLabel} = await pickLeastUsedProxy();
+    const { url: proxy, label: proxyLabel } = await pickLeastUsedProxy();
     const page = await browser.newPage();
 
     keywordRecord.proxy = proxyLabel;
@@ -87,7 +85,7 @@ export class ScraperService {
 
       const singlePageManipulator = new SinglePageManipulator(page);
 
-      const fileName = await singlePageManipulator.writeToFile(keyword); 
+      const fileName = await singlePageManipulator.writeToFile(keyword);
       const totalAnchorLinks = await singlePageManipulator.getTotalAnchorLinks();
       const adsCount = await singlePageManipulator.getAdsCount();
       const { searchTime, totalResults } = await singlePageManipulator.getSearchPerf();
@@ -106,9 +104,7 @@ export class ScraperService {
     const saved = await this.keywordRepository.save(keywordRecord);
     console.log({ savedKeword: saved });
 
-    setTimeout(async function() {      
-      await page.close();
-    }, 500);
+    await sleep(1000);
+    await page.close();
   }
-
 }

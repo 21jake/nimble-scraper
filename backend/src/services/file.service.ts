@@ -39,11 +39,10 @@ export class FileService {
   public concurrentUploadCount = 0;
 
   public async saveBatch(file: Express.Multer.File, user: User) {
-
     if (this.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
       throw new ServiceUnavailableException(ErrorResponses.MAX_CONCURRENT_UPLOAD);
     }
-    
+
     const batch = new Batch();
     batch.uploader = user;
     batch.originalName = file.originalname;
@@ -69,6 +68,11 @@ export class FileService {
     const keywords = readFileSync(path.join(appEnv.CSV_PATH, batch.fileName), { encoding: 'utf-8' })
       .toString()
       .split('\n');
+
+    if (keywords.length > appEnv.MAX_KEYWORDS_PER_BATCH) {
+      await this.batchRepository.delete(batch.id);
+      throw new BadRequestException(`${ErrorResponses.MAX_KEYWORDS_PER_BATCH} (Max: ${appEnv.MAX_KEYWORDS_PER_BATCH})`);
+    }
 
     const newEntities = keywords.map((keyword) => {
       const newEntity = new Keyword();

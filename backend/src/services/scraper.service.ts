@@ -1,19 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { chunk } from 'lodash';
+import puppeteer, { Browser } from 'puppeteer';
+import useProxy from 'puppeteer-page-proxy';
+import { appEnv } from 'src/configs/config';
 import { Batch } from 'src/entities/batch.entity';
 import { Keyword } from 'src/entities/keyword.entity';
 import { EmittedEvent } from 'src/utils/enums/event.enum';
 import { Repositories } from 'src/utils/enums/repositories.enum';
-import { Repository } from 'typeorm';
-import puppeteer, { Browser, Page } from 'puppeteer';
-import { pickLeastUsedProxy, SinglePageManipulator } from 'src/utils/scraper.utils';
-import dayjs from 'dayjs';
-import { writeFile, writeFileSync } from 'fs';
-import path from 'path';
-import { appEnv } from 'src/configs/config';
-import useProxy from 'puppeteer-page-proxy';
 import { sleep } from 'src/utils/helpers';
-import { chunk } from 'lodash';
+import { pickLeastUsedProxy, SinglePageManipulator } from 'src/utils/scraper.utils';
+import { Repository } from 'typeorm';
 import { FileService } from './file.service';
 
 
@@ -108,7 +105,10 @@ export class ScraperService {
 
     const saved = await this.keywordRepository.save(keywordRecord);
     console.log({ savedKeword: saved });
-    await page.close();
+
+    setTimeout(async function() {      
+      await page.close();
+    }, 500);
   }
 
 }

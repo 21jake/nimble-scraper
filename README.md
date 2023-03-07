@@ -15,11 +15,12 @@ Average time to search for 100 keywords is about 50 seconds. Currently a 2-CPU 4
 
 ### Run locally: 
 
-- Open terminal at the root directory
+- Open terminal at the root directory.
 - Run 
     - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml pull backend frontend </code>
     - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d </code>
-- The frontend app should be available at http://localhost
+- You might have to wait a bit for the containers to start up.
+- The frontend app should be available at your http://localhost
 
 ### Difficulties and potential fixes
 - This [bug](https://github.com/Cuadrix/puppeteer-page-proxy/issues/76) causes unexpected server crashes (which might in turn lead to frontend app freezes during streaming). The library is needed for proxifying the requests.  I haven't found a workaround.
@@ -30,4 +31,4 @@ Average time to search for 100 keywords is about 50 seconds. Currently a 2-CPU 4
 
 - Develop a "re-try" logic to re-scrape failed keywords.
 
-- Reduce the size of Docker image.
+- Reduce the size of Docker image and adding database healthcheck.

@@ -11,10 +11,11 @@ import {
   Sse,
   UploadedFile,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
+import { appEnv } from 'src/configs/config';
 import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
 import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -32,7 +33,10 @@ export class FileController {
     @Request() req,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'csv' }), new MaxFileSizeValidator({ maxSize: 100 })],
+        validators: [
+          new FileTypeValidator({ fileType: 'csv' }),
+          new MaxFileSizeValidator({ maxSize: appEnv.MAX_FILE_SIZE_BYTE }),
+        ],
       }),
     )
     file: Express.Multer.File,

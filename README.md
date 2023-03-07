@@ -1,7 +1,7 @@
 # nimble-scraper
 The tool: http://skrape.site/
 
-### Tech stacks used to make this:
+### Tech stacks:
 - Frontend: ReactJS/Redux, Bootstrap, CoreUI template.
 - Backend: NestJS, Puppeteer.
 - Deployment: Git, Docker, Compose.

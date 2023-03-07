@@ -25,9 +25,9 @@ export class CronService {
     private fileService: FileService,
   ) {}
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   async reScrape() {
-    console.log('Running cron job...');
+    console.log(`${dayjs().format(appEnv.APP_DATE_FORMAT)}: Running cron job...`);
     if (this.fileService.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
       return;
     }
@@ -55,7 +55,7 @@ export class CronService {
 
     const args = appEnv.IS_PROD ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
 
-    const browser = await puppeteer.launch({ args, headless: false });
+    const browser = await puppeteer.launch({ args });
 
     await this.scraperService.handleKeywordChunk(keywords, browser);
 

@@ -13,14 +13,15 @@ import {
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { Formik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ToastError } from 'src/components/shared/Toast';
 import { IKeyword } from 'src/models/keyword.model';
 import { RootState } from 'src/reducers';
 import { checkIfFileIsCsv } from 'src/utils/helpers';
 import * as Yup from 'yup';
 import { IUploadFile, uploadCsv } from '../dashboard.api';
-import { fetching } from '../dashboard.reducer';
+import { fetching, partialReset } from '../dashboard.reducer';
 import FormatGuide from './FormatGuide';
 import KeywordDetails from './KeywordDetails';
 import KeywordList from './KeywordList';
@@ -39,12 +40,19 @@ const validationSchema = Yup.object().shape({
 const Upload = () => {
   const dispatch = useDispatch();
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { streaming } = initialState;
+  const { streaming, errorMessage } = initialState;
 
   const [chosenKeyword, setChosenKeyword] = useState<IKeyword | null>(null);
 
   const [guideVisible, setGuideVisible] = useState(false);
   const popupGuide = () => setGuideVisible(true);
+
+  useEffect(() => {
+    if (errorMessage) {
+      ToastError(errorMessage);
+      dispatch(partialReset());
+    }
+  }, [errorMessage]);
 
   return (
     <CRow>
@@ -93,8 +101,11 @@ const Upload = () => {
                         {errors.file}
                       </CFormFeedback>
                       <p className="text-medium-emphasis small mt-1">
-                        Take a look at the <span className="text-info cursor-pointer" onClick={popupGuide}>CSV file format</span> to ensure
-                        everything works as expected.
+                        Take a look at the{' '}
+                        <span className="text-info cursor-pointer" onClick={popupGuide}>
+                          CSV file format
+                        </span>{' '}
+                        to ensure everything works as expected.
                       </p>
                       <CButton variant="outline" type="submit" disabled={streaming}>
                         Upload

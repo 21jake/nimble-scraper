@@ -30,7 +30,6 @@ const initialState: IInitialFileUploadState = {
   totalItems: 0,
   cacheBatches: [],
   streaming: false,
-
 };
 
 export const dashboardAdapter = createEntityAdapter<IBatch | IKeyword>({
@@ -54,14 +53,19 @@ const { actions, reducer } = createSlice({
       state.initialState.cacheBatches = [];
       state.initialState.streaming = false;
     },
-    setKwProcessedCount(state, {payload}: PayloadAction<number>) {
+    partialReset(state) {
+      state.initialState.loading = false;
+      state.initialState.uploadSuccess = false;
+      state.initialState.errorMessage = undefined;
+      state.initialState.streaming = false;
+    },
+    setKwProcessedCount(state, { payload }: PayloadAction<number>) {
       if (!state.initialState.batch) return;
       state.initialState.batch.processedCount = payload;
     },
-    streaming(state, {payload}: PayloadAction<boolean>) {
+    streaming(state, { payload }: PayloadAction<boolean>) {
       state.initialState.streaming = payload;
     },
- 
   },
   extraReducers: {
     [uploadCsv.fulfilled.type]: (state, { payload }: PayloadAction<IBatch>) => {
@@ -100,7 +104,7 @@ const { actions, reducer } = createSlice({
   },
 });
 
-export const { fetching, resetAll, setKwProcessedCount, streaming} = actions;
+export const { fetching, resetAll, setKwProcessedCount, streaming, partialReset } = actions;
 
 export const dashboardSelectors = dashboardAdapter.getSelectors<RootState>((state) => state.dashboard);
 

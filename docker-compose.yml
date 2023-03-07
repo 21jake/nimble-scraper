@@ -2,45 +2,24 @@ version: "3.8"
 
 services:
   database:
-    image: bitnami/mysql:8.0.26
+    image: docker.io/bitnami/postgresql:15
     restart: always
-    volumes:
-      - ./volumes/mysql/:/bitnami/mysql/data
-    environment:
-      - TZ=Asia/Ho_Chi_Minh
-      - MYSQL_ROOT_USER=root
-      - MYSQL_ROOT_PASSWORD=123456
+  adminer:
+    image: adminer
+    restart: always
     ports:
-      - "3308:3306"
-  phpmyadmin:
-    image: phpmyadmin
-    environment:
-      PMA_ARBITRARY: 1
-      UPLOAD_LIMIT: 10M
-    ports:
-      - "14000:80"
+      - 8080:8080
   backend:
-    image: boilerplate/backend
     platform: linux/amd64
     restart: unless-stopped
-    build: 
+    build:
       context: .
       dockerfile: ./backend/Dockerfile
-    env_file:
-      - ./backend/.env
-    environment:
-      - DATABASE_NAME=test-prod
-      - DATABASE_HOST=database
-      - DATABASE_PORT=3306
-    depends_on:
-      - database
-    ports:
-      - 5000:5000
-
   frontend:
-    image: boilerplate/frontend
+    platform: linux/amd64
+    restart: always
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - "3000:80"
+      - "80:80"

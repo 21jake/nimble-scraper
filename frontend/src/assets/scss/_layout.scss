@@ -1,6 +1,22 @@
 .wrapper {
   width: 100%;
-  @include ltr-rtl("padding-left", var(--cui-sidebar-occupy-start, 0));
+  @include ltr-rtl('padding-left', var(--cui-sidebar-occupy-start, 0));
   will-change: auto;
-  @include transition(padding .15s);
+  @include transition(padding 0.15s);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@keyframes tilt-shaking {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0eg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.constant-tilt-shake {
+  animation: tilt-shaking 0.3s infinite;
 }

@@ -1,9 +1,18 @@
-FROM node:18-alpine as Builder
+FROM node:16-slim as Builder
 RUN yarn global add typescript @nestjs/cli
 COPY ../backend /app/
 RUN cd /app && yarn && yarn run build
 
-FROM node:18-alpine as Production
+FROM node:16-slim as Production
+ENV NODE_ENV=prod \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+RUN apt-get update && apt-get install gnupg wget -y && \
+  wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
+  sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
+  apt-get update && \
+  apt-get install google-chrome-stable -y --no-install-recommends && \
+  rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY --from=Builder /app .
 CMD node ./dist/main

@@ -1,9 +1,13 @@
 import {
-  Body,
   Controller,
-  FileTypeValidator, Get, Param,
+  FileTypeValidator,
+  Get,
+  MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
-  Post, Query, Request,
+  Post,
+  Query,
+  Request,
   Sse,
   UploadedFile,
   UseGuards,
@@ -28,7 +32,7 @@ export class FileController {
     @Request() req,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'csv' })],
+        validators: [new FileTypeValidator({ fileType: 'csv' }), new MaxFileSizeValidator({ maxSize: 100 })],
       }),
     )
     file: Express.Multer.File,
@@ -38,26 +42,18 @@ export class FileController {
 
   @Get('/batches')
   @UseGuards(JwtAuthGuard)
-  async getBatches(
-    @Request() req,
-    @Query() params: BatchQueryDto,
-  ) {
+  async getBatches(@Request() req, @Query() params: BatchQueryDto) {
     return await this.fileService.getBatches(req.user, params);
   }
 
   @Get('/keywords')
   @UseGuards(JwtAuthGuard)
-  async getKeywords(
-    @Request() req,
-    @Query() params: KeywordQueryDto,
-  ) {
+  async getKeywords(@Request() req, @Query() params: KeywordQueryDto) {
     return await this.fileService.getKeywords(req.user, params);
   }
 
   @Sse('/:batchId')
-  async streamBatchDetail(
-    @Param('batchId') batchId: string,
-  ): Promise<Observable<IObservableData<Keyword[]>>> {
+  async streamBatchDetail(@Param('batchId') batchId: string): Promise<Observable<IObservableData<Keyword[]>>> {
     return await this.fileService.streamBatchDetail(batchId);
   }
 }

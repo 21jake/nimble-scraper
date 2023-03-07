@@ -31,5 +31,6 @@ export const appEnv = {
   CHUNK_SIZE,
   DELAY_BETWEEN_CHUNK_MS: 5_000,
   PAGE_TIMEOUT_MS: 10_000,
-  MAX_CONCURRENT_UPLOAD: Math.round(proxiesCount / CHUNK_SIZE) - 1
+  MAX_CONCURRENT_UPLOAD: Math.round(proxiesCount / CHUNK_SIZE) - 1,
+  MAX_KEYWORDS_PER_BATCH: 150,
 };

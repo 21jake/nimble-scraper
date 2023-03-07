@@ -16,7 +16,9 @@ Average time to search for 100 keywords is about 50 seconds. Currently a 2-CPU 4
 ### Run locally: 
 
 - Open terminal at the root directory
-- Run <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d </code>
+- Run 
+    - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml pull backend frontend </code>
+    - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d </code>
 - The frontend app should be available at http://localhost
 
 ### Difficulties and potential fixes

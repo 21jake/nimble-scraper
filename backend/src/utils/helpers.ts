@@ -23,6 +23,8 @@ export const csvMulterOptions: MulterOptions = {
   }),
 };
 
+// You might see this function got scattered around the codebase
+// mostly to deal with puppeteer
 export const sleep = (ms = 5_000) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };

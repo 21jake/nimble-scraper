@@ -55,7 +55,7 @@ export class CronService {
 
     const args = appEnv.IS_PROD ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
 
-    const browser = await puppeteer.launch({ args, headless: false });
+    const browser = await puppeteer.launch({ args });
 
     await this.scraperService.handleKeywordChunk(keywords, browser);
 

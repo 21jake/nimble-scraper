@@ -6,6 +6,8 @@ import { User } from '../../entities/user.entity';
 import { batch, keywords, testKeywordPref, user } from '../unit-test.data';
 
 export class createUnitTestRecords1678075998716 implements MigrationInterface {
+  name = 'createUnitTestRecords1678075998716'
+
   // This migration is only for testing purposes and only runs in the local database
 
   public async up(qr: QueryRunner): Promise<void> {

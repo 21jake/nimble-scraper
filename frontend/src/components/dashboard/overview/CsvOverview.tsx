@@ -72,6 +72,7 @@ const CsvOverview = (props: ITabPaneProps) => {
   const [filterState, setFilterState] = useState<IParams>({
     page: 0,
     size: 25,
+    timestamp: dayjs().unix()
   });
 
   const batches = useSelector(dashboardSelectors.selectAll);
@@ -142,6 +143,7 @@ const CsvOverview = (props: ITabPaneProps) => {
                   variant="outline"
                   className={` me-3 border-0`}
                   onClick={() => {
+                    setFieldValue('timestamp', dayjs().unix());
                     submitForm();
                   }}
                 >

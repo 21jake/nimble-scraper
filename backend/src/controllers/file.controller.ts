@@ -19,10 +19,12 @@ import { appEnv } from 'src/configs/config';
 import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
 import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RequestInterceptor } from 'src/interceptor/request.interceptor';
 import { FileService } from 'src/services/file.service';
 import { csvMulterOptions } from 'src/utils/helpers';
 
 @Controller('/api/file')
+@UseInterceptors(new RequestInterceptor())
 export class FileController {
   constructor(private fileService: FileService) {}
 

@@ -52,6 +52,7 @@ const Upload = () => {
       ToastError(errorMessage);
       dispatch(partialReset());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorMessage]);
 
   return (

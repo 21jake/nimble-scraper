@@ -5,7 +5,12 @@ import { Keyword } from '../../entities/keyword.entity';
 import { User } from '../../entities/user.entity';
 import { batch, keywords, testKeywordPref, user } from '../unit-test.data';
 
+// UNCOMMENT THIS BEFORE RUNNING TEST CASES. 
+
+/**
 export class createUnitTestRecords1678075998716 implements MigrationInterface {
+  name = 'createUnitTestRecords1678075998716'
+
   // This migration is only for testing purposes and only runs in the local database
 
   public async up(qr: QueryRunner): Promise<void> {
@@ -57,4 +62,6 @@ export class createUnitTestRecords1678075998716 implements MigrationInterface {
     // delete where name Like 'testKeywordPref%'
     await keywordRepo.delete({ name: Like(testKeywordPref) });
   }
+  
 }
+ */

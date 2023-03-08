@@ -11,7 +11,7 @@ Uploaded CSVs will get their keywords parsed. Keywords are divided into chunks o
 
 I use static proxies rotating for each request to bypass Google mass searching detection. To ensure the longevity of the proxies, a delay is needed between each chunk.
 
-Average time to finish a "batch" of 100 keywords is about 4 minutes. Currently a 2-CPU 4GB Ubuntu server can handle up to 4 concurrent uploads before showing sign of scraping failures (Captcha-ed, Timeout, etc).
+Average time to finish a "batch" of 100 keywords is about 4 minutes. Currently a 2-CPU 4GB Ubuntu server with 22 proxies can handle up to 7 concurrent uploads before showing sign of scraping failures (Captcha-ed, Timeout, etc).
 
 In case of failure, error messages are recorded. A cron service will periodically check for failed keywords and re-scrape them.
 

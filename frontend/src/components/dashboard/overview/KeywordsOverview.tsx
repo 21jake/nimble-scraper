@@ -16,6 +16,7 @@ import {
   CSmartTable,
   CTooltip,
 } from '@coreui/react-pro';
+import dayjs from 'dayjs';
 import { Formik } from 'formik';
 import { truncate } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -92,10 +93,11 @@ const KeywordsOverview = (props: ITabPaneProps) => {
   const [filterState, setFilterState] = useState<IParams>({
     page: 0,
     size: 25,
+    timestamp: dayjs().unix()
   });
 
   const { initialState } = useSelector((state: RootState) => state.dashboard);
-  const { totalItems, cacheBatches } = initialState;
+  const { totalItems, cacheBatches, loading } = initialState;
   const totalPages = Math.ceil(totalItems / filterState.size);
 
   const handlePaginationChange = (page: number) => {
@@ -201,6 +203,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
                     variant="outline"
                     className={` me-3 border-0`}
                     onClick={() => {
+                      setFieldValue('timestamp', dayjs().unix());
                       submitForm();
                     }}
                   >
@@ -222,6 +225,7 @@ const KeywordsOverview = (props: ITabPaneProps) => {
         items={indexedKeywords}
         itemsPerPage={filterState.size}
         noItemsLabel="No keywords found"
+        loading={loading}
         scopedColumns={{
           keyword: (item: IKeyword) => <td>{truncate(item.name, { length: 25 })}</td>,
           status: (item: IKeyword) => <td>{statusBadge(item.success)}</td>,

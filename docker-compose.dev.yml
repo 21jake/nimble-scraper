@@ -13,7 +13,7 @@ services:
       - TZ=Asia/Ho_Chi_Minh
       - POSTGRESQL_TIMEZONE=Asia/Ho_Chi_Minh
   backend:
-    image: jake21/scraper-backend
+    image: jake21/scraper-backend:exp
     env_file:
       - ./backend/.env.dev
     ports:

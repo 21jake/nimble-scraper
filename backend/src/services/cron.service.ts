@@ -27,7 +27,6 @@ export class CronService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async reScrape() {
-    console.log(`${dayjs().format(appEnv.APP_DATE_FORMAT)}: Running cron job...`);
     if (this.fileService.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
       return;
     }

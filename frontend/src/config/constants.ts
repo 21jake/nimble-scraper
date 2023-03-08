@@ -1,11 +1,9 @@
-const { REACT_APP_BACKEND_PORT: BACKEND_PORT, REACT_APP_BACKEND_HOST: BACKEND_HOST, NODE_ENV } = process.env;
+const { REACT_APP_BACKEND_PORT: BACKEND_PORT, NODE_ENV } = process.env;
 
-
-const SERVER_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+const SERVER_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
 
 export const appEnv = {
   BACKEND_PORT,
-  BACKEND_HOST,
   SERVER_URL,
   SERVER_API_URL: `${SERVER_URL}/api`,
   NODE_ENV,

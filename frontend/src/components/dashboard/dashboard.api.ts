@@ -29,6 +29,7 @@ export interface IParams {
   keyword?: string;
   batchId?: number;
   status?: string;
+  timestamp?: number;
 }
 
 export const getBatches = createAsyncThunk(`get-all-${prefix}-batches`, async (fields: IParams, thunkAPI) => {

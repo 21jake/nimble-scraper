@@ -1,10 +1,11 @@
-import CsvImg from 'src/assets/img/csv-icon.png';
-
 import CIcon from '@coreui/icons-react';
 import { CButton, CCard, CCardBody, CCardHeader, CCardTitle, CCol, CImage, CRow } from '@coreui/react-pro';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { truncate } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import CsvImg from 'src/assets/img/csv-icon.png';
+import { ToastInfo } from 'src/components/shared/Toast';
 import { appEnv } from 'src/config/constants';
 import { IKeyword } from 'src/models/keyword.model';
 import { RootState } from 'src/reducers';
@@ -20,34 +21,63 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
   const { initialState } = useSelector((state: RootState) => state.dashboard);
   const { batch } = initialState;
   const [keywords, setKeywords] = useState<IKeyword[]>([]);
-  const mountedRef = useRef(true)
+  const mountedRef = useRef(true);
+
+  const [serverError, setServerError] = useState<boolean>(false);
 
   useEffect(() => {
-    if (batch) {
-      dispatch(streaming(true));
-      const eventSource = new EventSource(`${appEnv.SERVER_API_URL}/file/${batch.id}`);
-      eventSource.onmessage = (e) => {
-
-        if (!mountedRef.current) return null
-        const kws: IKeyword[] = JSON.parse(e.data);
-        setKeywords(kws);
-        const totalCompleted = kws.filter((kw) => kw.success !== null).length;
-        dispatch(setKwProcessedCount(totalCompleted));
-
-        if (totalCompleted === batch.keywordCount) {
-          dispatch(streaming(false));
-          eventSource.close();
-        }
-      };
+    if (serverError) {
+      ToastInfo('There was an error from the Server. Please try upload again later');
     }
+  }, [serverError]);
+
+  useEffect(() => {
+    if (!batch) return;
+    dispatch(streaming(true));
+    const controller = new AbortController();
+    const token = localStorage.getItem(appEnv.TOKEN_LABEL);
+    const fetchData = async () => {
+      await fetchEventSource(`${appEnv.SERVER_API_URL}/file/${batch.id}`, {
+        headers: {
+          // add bearer token
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+        async onopen(res) {
+          console.log('Connection Established', res);
+        },
+        onmessage(event) {
+          if (!mountedRef.current || !event.data) return null;
+          const kws: IKeyword[] = JSON.parse(event.data);
+          setKeywords(kws);
+          const totalCompleted = kws.filter((kw) => kw.success !== null).length;
+          dispatch(setKwProcessedCount(totalCompleted));
+
+          if (totalCompleted === batch.keywordCount) {
+            dispatch(streaming(false));
+            controller.abort();
+          }
+        },
+        onclose() {
+          ToastInfo('Connection closed by the Server');
+        },
+        onerror(err) {
+          setServerError(true);
+          controller.abort();
+        },
+      });
+    };
+    fetchData();
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [batch]);
 
   useEffect(() => {
-    return () => { 
-      mountedRef.current = false
-    }
-  }, [])
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   return (
     <CRow className={`mt-3`}>

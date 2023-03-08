@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: ./backend/Dockerfile
   frontend:
-    image: jake21/local-scraper-frontend
+    image: jake21/scraper-frontend
     platform: linux/amd64
     restart: always
     build:

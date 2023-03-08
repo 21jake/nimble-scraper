@@ -25,7 +25,7 @@ In case of failure, error messages are recorded. A cron service will periodicall
 - The frontend app should be available at your http://localhost
 
 ### Difficulties and potential fixes
-- This [bug](https://github.com/Cuadrix/puppeteer-page-proxy/issues/76) causes unexpected server crashes (which might in turn lead to frontend app freezes during streaming). The library is needed for proxifying the requests.  I haven't found a workaround.
+- This [bug](https://github.com/Cuadrix/puppeteer-page-proxy/issues/76) causes unexpected server crashes (which might in turn lead to frontend app freezes during streaming). The library is needed for proxifying the requests.
 
 - Streaming scraped data to frontend feels slow. I might try to employ a Captcha solver service to somehow speed the scraping process.
 

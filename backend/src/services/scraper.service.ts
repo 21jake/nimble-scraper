@@ -101,10 +101,15 @@ export class ScraperService {
       keywordRecord.error = error.message;
     }
 
+    try {
+      await page.close();
+    } catch (error) {
+      console.log(`Error closing page: ${error.message}`);
+    }
+
     const saved = await this.keywordRepository.save(keywordRecord);
     console.log({ savedKeword: saved });
 
-    await sleep(1000);
-    await page.close();
+
   }
 }

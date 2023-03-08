@@ -10,6 +10,7 @@
     "@coreui/react": "^4.6.0",
     "@coreui/react-chartjs": "^2.1.2",
     "@coreui/react-pro": "^4.8.0",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@reduxjs/toolkit": "^1.7.1",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",

@@ -43,7 +43,7 @@ export class FileController {
     )
     file: Express.Multer.File,
   ) {
-    return await this.fileService.saveBatch(file, req.user);
+    return await this.fileService.handleFileUpload(file, req.user);
   }
 
   @Get('/batches')
@@ -60,8 +60,8 @@ export class FileController {
 
   @Sse('/:batchId')
   @UseGuards(JwtAuthGuard)
-  async streamBatchDetail(@Param('batchId') batchId: string): Promise<Observable<IObservableData<Keyword[]>>> {
-    return await this.fileService.streamBatchDetail(batchId);
+  async streamBatchDetail(@Param('batchId') batchId: string, @Request() req): Promise<Observable<IObservableData<Keyword[]>>> {
+    return await this.fileService.streamBatchDetail(batchId, req.user);
   }
 }
 interface IObservableData<T> {

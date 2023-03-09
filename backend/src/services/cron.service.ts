@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import dayjs from 'dayjs';
+import puppeteer from 'puppeteer';
+import { appEnv } from 'src/configs/config';
 import { Batch } from 'src/entities/batch.entity';
 import { Keyword } from 'src/entities/keyword.entity';
 import { Repositories } from 'src/utils/enums/repositories.enum';
-import { LessThan, MoreThan, Not, Repository } from 'typeorm';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { ScraperService } from './scraper.service';
-import { FileService } from './file.service';
-import { appEnv } from 'src/configs/config';
-import dayjs from 'dayjs';
-import puppeteer, { Browser } from 'puppeteer';
 import { sleep } from 'src/utils/helpers';
+import { Repository } from 'typeorm';
+import { FileService } from './file.service';
+import { ScraperService } from './scraper.service';
 
 @Injectable()
 export class CronService {

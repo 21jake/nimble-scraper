@@ -61,7 +61,7 @@ export class ScraperService {
   private async scrapeKeyword(keywordId: number, browser: Browser) {
     const keywordRecord = await this.keywordRepository.findOne({ where: { id: keywordId } });
     const keyword = keywordRecord.name.replaceAll(' ', '+');
-    const { url: proxy, label: proxyLabel } = await pickLeastUsedProxy();
+    const { url: proxy, label: proxyLabel } = pickLeastUsedProxy();
     const page = await browser.newPage();
 
     keywordRecord.proxy = proxyLabel;

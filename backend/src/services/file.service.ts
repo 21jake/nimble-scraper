@@ -2,15 +2,12 @@ import {
   BadRequestException,
   ForbiddenException,
   Inject,
-  Injectable,
-  MessageEvent,
-  ServiceUnavailableException,
-  UnauthorizedException,
+  Injectable, ServiceUnavailableException
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { fromEvent, interval, map, Observable, Subject, switchMap } from 'rxjs';
+import { interval, switchMap } from 'rxjs';
 import { appEnv } from 'src/configs/config';
 import { SortType } from 'src/dto/base-query.dto';
 import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
@@ -38,30 +35,23 @@ export class FileService {
 
   public concurrentUploadCount = 0;
 
-  public async saveBatch(file: Express.Multer.File, user: User) {
+  public async handleFileUpload(file: Express.Multer.File, user: User) {
     if (this.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
       throw new ServiceUnavailableException(ErrorResponses.MAX_CONCURRENT_UPLOAD);
     }
-
+    const newBatch = await this.saveBatch(file, user);
+    const keywords = await this.saveKeywords(newBatch);
+    this.eventEmitter.emit(EmittedEvent.NEW_BATCH, newBatch);
+    return ({...newBatch, keywordCount: keywords.length, processedCount: 0}) 
+  }
+  
+  private async saveBatch(file: Express.Multer.File, user: User) {
     const batch = new Batch();
     batch.uploader = user;
     batch.originalName = file.originalname;
     batch.fileName = file.filename;
 
-    const newBatch = await this.batchRepository.save(batch);
-    await this.saveKeywords(newBatch);
-
-    this.eventEmitter.emit(EmittedEvent.NEW_BATCH, newBatch);
-
-    const entityName = 'batch';
-    let query = this.batchRepository
-      .createQueryBuilder(entityName)
-      .where(`${entityName}.id = :id`, { id: newBatch.id });
-
-    query = this.addKeywordCountQb(query, entityName);
-
-    const newBatchwithKeywordCount = await query.getOne();
-    return newBatchwithKeywordCount;
+    return await this.batchRepository.save(batch);
   }
 
   private async saveKeywords(batch: Batch) {
@@ -90,7 +80,7 @@ export class FileService {
     return filteredKeywords;
   };
 
-  async streamBatchDetail(batchId: string) {
+  async streamBatchDetail(batchId: string, user: User) {
     const batch = await this.batchRepository.findOne({
       where: { id: Number(batchId) },
       relations: ['uploader'],
@@ -99,9 +89,9 @@ export class FileService {
     if (!batch) {
       throw new BadRequestException(ErrorResponses.RECORD_NOT_FOUND);
     }
-    // if (batch.uploader.id !== user.id) {
-    //   throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
-    // }
+    if (batch.uploader.id !== user.id) {
+      throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
+    }
 
     return interval(appEnv.DELAY_BETWEEN_CHUNK_MS).pipe(
       switchMap(async (_) => {

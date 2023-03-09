@@ -1,9 +1,9 @@
-import puppeteer, { Browser, Page } from 'puppeteer';
-import { readFile, readFileSync, writeFileSync } from 'fs';
-import { first } from 'lodash';
-import { appEnv } from 'src/configs/config';
 import dayjs from 'dayjs';
+import { readFileSync, writeFileSync } from 'fs';
+import { first } from 'lodash';
 import path from 'path';
+import { Page } from 'puppeteer';
+import { appEnv } from 'src/configs/config';
 
 interface IProxy {
   url: string;
@@ -15,10 +15,10 @@ interface IProxy {
  * Pick the least used proxy from at the first index of the proxies array
  * Then increase the count of the proxy by 1
  * Then sort the proxies by count
- * @returns {Promise<string>} - The least used proxy url
+ * @returns {Promise<IProxy>} - The least used proxy
  */
 
-export const pickLeastUsedProxy = async () => {
+export const pickLeastUsedProxy = () => {
   const proxies: IProxy[] = JSON.parse(readFileSync(appEnv.PROXY_FILE_PATH, { encoding: 'utf-8' }));
 
   const leastUsed = first(proxies);
@@ -32,7 +32,7 @@ export const pickLeastUsedProxy = async () => {
     })
     .sort((a, b) => a.count - b.count);
 
-  await writeFileSync(appEnv.PROXY_FILE_PATH, JSON.stringify(sortedProxies, null, 2));
+  writeFileSync(appEnv.PROXY_FILE_PATH, JSON.stringify(sortedProxies, null, 2));
   return leastUsed;
 };
 

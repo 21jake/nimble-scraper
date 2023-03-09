@@ -81,8 +81,14 @@ export class FileService {
       return newEntity;
     });
 
-    return await this.keywordRepository.save(newEntities);
+    return await this.keywordRepository.save(this.filterKeywords(newEntities));
   }
+
+  private filterKeywords = (keywords: Keyword[]) => {
+    // filter empty keywords and keywords with length > 150
+    const filteredKeywords = keywords.filter((e) => e.name && e.name.length <= 150);
+    return filteredKeywords;
+  };
 
   async streamBatchDetail(batchId: string) {
     const batch = await this.batchRepository.findOne({

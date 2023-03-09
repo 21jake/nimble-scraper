@@ -11,6 +11,7 @@ const STORAGE_PATH = path.join(__dirname, '../..', '/storage');
 const HTML_CACHE_PATH = path.join(STORAGE_PATH, '/html');
 const CSV_PATH = path.join(STORAGE_PATH, '/csv');
 const PROXY_FILE_PATH = path.join(__dirname, '../..', '/proxies.json');
+const SAMPLES_PATH = path.join(__dirname, '../..', '/test/samples');
 
 const proxiesCount = Number(JSON.parse(readFileSync(PROXY_FILE_PATH, 'utf-8')).length);
 const CHUNK_SIZE = 3 // Number of keywords scraped at a time
@@ -34,5 +35,6 @@ export const appEnv = {
   MAX_CONCURRENT_UPLOAD: Math.round(proxiesCount / CHUNK_SIZE) - 2,
   MAX_KEYWORDS_PER_BATCH: 100,
   MAX_FILE_SIZE_BYTE: 100 * 1024,
-  APP_DATE_FORMAT: 'HH:mm - DD/MM/YY'
+  APP_DATE_FORMAT: 'HH:mm - DD/MM/YY',
+  SAMPLES_PATH
 };

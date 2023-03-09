@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { fromEvent, interval, map, Observable, Subject, switchMap } from 'rxjs';
 import { appEnv } from 'src/configs/config';
+import { user } from 'src/database/unit-test.data';
 import { SortType } from 'src/dto/base-query.dto';
 import { BatchQueryDto, KeywordQueryDto } from 'src/dto/file-query.dto';
 import { Batch } from 'src/entities/batch.entity';
@@ -22,7 +23,7 @@ import { EmittedEvent } from 'src/utils/enums/event.enum';
 import { StatusQuery } from 'src/utils/enums/query.enum';
 import { Repositories } from 'src/utils/enums/repositories.enum';
 import { RespWrapper } from 'src/utils/response-wrapper';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Not, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class FileService {
@@ -84,7 +85,7 @@ export class FileService {
     return await this.keywordRepository.save(newEntities);
   }
 
-  async streamBatchDetail(batchId: string) {
+  async streamBatchDetail(batchId: string, user: User) {
     const batch = await this.batchRepository.findOne({
       where: { id: Number(batchId) },
       relations: ['uploader'],
@@ -93,16 +94,22 @@ export class FileService {
     if (!batch) {
       throw new BadRequestException(ErrorResponses.RECORD_NOT_FOUND);
     }
-    // if (batch.uploader.id !== user.id) {
-    //   throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
-    // }
+    if (batch.uploader.id !== user.id) {
+      throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
+    }
+    let cache = [];
 
     return interval(appEnv.DELAY_BETWEEN_CHUNK_MS).pipe(
       switchMap(async (_) => {
         const keywords = await this.keywordRepository.find({
-          where: { batch: { id: batch.id } },
+          where: { batch: { id: batch.id }, id: Not(In(cache)) },
           order: { success: 1, createdDate: 'ASC' },
+          take: appEnv.CHUNK_SIZE,
         });
+        
+        const keywordIds = keywords.map((keyword) => keyword.id);
+        cache = [...cache, ...keywordIds];
+
         return {
           data: keywords,
         };

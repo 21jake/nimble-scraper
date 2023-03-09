@@ -22,6 +22,7 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
   const { batch } = initialState;
   const [keywords, setKeywords] = useState<IKeyword[]>([]);
   const mountedRef = useRef(true);
+  const keywordsRef = useRef<IKeyword[]>([]);
 
   const [serverError, setServerError] = useState<boolean>(false);
 
@@ -30,6 +31,20 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
       ToastInfo('There was an error from the Server. Please try upload again later');
     }
   }, [serverError]);
+
+  // useEffect(() => {
+  //   keywordsRef.current = [...keywordsRef.current, ...keywords];
+  //   console.log({keywordsRefCurrent: keywordsRef.current})
+  // }, [keywords]);
+
+  const checkToStopStreaming = (kws: IKeyword[], ctrlr: AbortController) => {
+    const totalCompleted = kws.filter((kw) => kw.success !== null).length;
+    dispatch(setKwProcessedCount(totalCompleted));
+    if (totalCompleted === batch?.keywordCount) {
+      dispatch(streaming(false));
+      ctrlr.abort();
+    }
+  };
 
   useEffect(() => {
     if (!batch) return;
@@ -49,15 +64,17 @@ const KeywordList = ({ setChosenKeyword }: IKeywordListProps) => {
         },
         onmessage(event) {
           if (!mountedRef.current || !event.data) return null;
-          const kws: IKeyword[] = JSON.parse(event.data);
-          setKeywords(kws);
-          const totalCompleted = kws.filter((kw) => kw.success !== null).length;
-          dispatch(setKwProcessedCount(totalCompleted));
+          const newBuffer: IKeyword[] = JSON.parse(event.data);
 
-          if (totalCompleted === batch.keywordCount) {
-            dispatch(streaming(false));
-            controller.abort();
-          }
+          // const mergedKeywords = [...keywordsRef.current, ...newBuffer];
+          // console.log({keywords, newBuffer, mergedKeywords})
+
+          // setKeywords((prevstate) => [...mergedKeywords]);
+          keywordsRef.current = [...keywordsRef.current, ...newBuffer];
+
+          setKeywords(keywordsRef.current);
+
+          checkToStopStreaming(keywordsRef.current, controller);
         },
         onclose() {
           ToastInfo('Connection closed by the Server');

@@ -13,16 +13,12 @@ services:
       - TZ=Asia/Ho_Chi_Minh
       - POSTGRESQL_TIMEZONE=Asia/Ho_Chi_Minh
   backend:
-    image: jake21/scraper-backend
     env_file:
       - ./backend/.env.dev
     ports:
       - 5000:5000
     volumes:
       - './volumes/backend-storage:/app/storage'
-    build:
-      context: .
-      dockerfile: ./backend/Dockerfile.dev
 
 volumes:
   scraper-db:

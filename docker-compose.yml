@@ -10,7 +10,7 @@ services:
     ports:
       - 8080:8080
   backend:
-    image: jake21/local-scraper-backend
+    image: jake21/scraper-backend
     platform: linux/amd64
     restart: unless-stopped
     build:

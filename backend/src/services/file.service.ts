@@ -36,9 +36,7 @@ export class FileService {
   public concurrentUploadCount = 0;
 
   public async handleFileUpload(file: Express.Multer.File, user: User) {
-    if (this.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
-      throw new ServiceUnavailableException(ErrorResponses.MAX_CONCURRENT_UPLOAD);
-    }
+
     const newBatch = await this.saveBatch(file, user);
     const keywords = await this.saveKeywords(newBatch);
     this.eventEmitter.emit(EmittedEvent.NEW_BATCH, newBatch);
@@ -93,7 +91,7 @@ export class FileService {
       throw new ForbiddenException(ErrorResponses.INVALID_CREDENTIALS);
     }
 
-    return interval(appEnv.DELAY_BETWEEN_CHUNK_MS).pipe(
+    return interval(5_000).pipe(
       switchMap(async (_) => {
         const keywords = await this.keywordRepository.find({
           where: { batch: { id: batch.id } },

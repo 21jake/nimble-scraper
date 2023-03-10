@@ -1,11 +1,9 @@
+import axios, { AxiosProxyConfig, AxiosRequestConfig } from 'axios';
 import dayjs from 'dayjs';
 import { readFileSync, writeFileSync } from 'fs';
 import { first } from 'lodash';
 import path from 'path';
-import { Page } from 'puppeteer';
 import { appEnv } from 'src/configs/config';
-import axios, { AxiosRequestConfig, AxiosProxyConfig } from 'axios';
-import randomUserAgent from 'random-useragent';
 import * as cheerio from 'cheerio';
 interface IProxy {
   url: string;
@@ -43,41 +41,119 @@ export const pickLeastUsedProxy = () => {
   return leastUsed;
 };
 
-export class SinglePageManipulator {
-  page: Page;
-  constructor(page: Page) {
-    this.page = page;
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 12.6; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (X11; Linux i686; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edge/106.0.1370.47',
+];
+
+function randomUserAgent(): string {
+  const randomIndex = Math.floor(Math.random() * USER_AGENTS.length);
+  return USER_AGENTS[randomIndex];
+}
+
+export class HttpScraper {
+  private keyword: string;
+
+  private cheerioAPI: cheerio.CheerioAPI;
+
+  public proxy: IProxy;
+
+  // private baseUrl: string;
+  private axiosConfig: AxiosRequestConfig;
+
+  constructor(kw: string) {
+    this.keyword = kw.replaceAll(' ', '+');
+
+    this.proxy = pickLeastUsedProxy();
+    let axiosProxy: AxiosProxyConfig | undefined;
+    if (this.proxy.url) {
+      axiosProxy = {
+        host: this.proxy.host,
+        port: this.proxy.port,
+        protocol: this.proxy.protocol,
+        auth: {
+          username: this.proxy.username,
+          password: this.proxy.pw,
+        },
+      };
+    }
+
+    this.axiosConfig = {
+      method: 'GET',
+      url: `https://www.google.com/search?q=${this.keyword}`,
+      headers: {
+        'User-Agent': randomUserAgent(),
+      },
+      proxy: axiosProxy,
+    };
   }
 
-  public async writeToFile(keyword: string) {
-    const fileName = `${keyword}-${dayjs().unix()}.html`;
-    const htmlContent = await this.page.content();
-    await writeFileSync(path.join(appEnv.HTML_CACHE_PATH, fileName), htmlContent);
+  public async scrape() {
+    const response = await axios(this.axiosConfig);
+    this.cheerioAPI = cheerio.load(response.data);
+    return response;
+  }
+
+  public getOverviewScrapedInfo() {
+
+    if (!this.cheerioAPI) {
+      throw new Error('No data scraped yet!');
+    }
+
+    // Check if html contains captcha
+    const captcha = this.cheerioAPI('form#captcha-form').length;
+    if (captcha) {
+      throw new Error('Captcha-ed');
+    }
+
+    const fileName = this.writeToFile();
+    const totalAnchorLinks = this.getTotalAnchorLinks();
+    const adsCount = this.getAdsCount();
+    const { searchTime, totalResults } = this.getSearchPerf();
+    return {
+      totalAnchorLinks,
+      adsCount,
+      searchTime,
+      totalResults,
+      fileName,
+    };
+  }
+
+  private writeToFile() {
+    const html = this.cheerioAPI('html').html();
+    const fileName = `${this.keyword}-${dayjs().unix()}.html`;
+    writeFileSync(path.join(appEnv.HTML_CACHE_PATH, fileName), html);
     return fileName;
   }
 
-  public async getTotalAnchorLinks() {
-    const totalAnchorLinks = await this.page.$$eval('a', (links) => links.length);
+  private getTotalAnchorLinks() {
+    const totalAnchorLinks = this.cheerioAPI('a').length;
     return totalAnchorLinks;
   }
 
-  public async getAdsCount() {
+  private getAdsCount() {
     // 1. <div> with data-text-ad="1"
     // 2. <div> with class "pla-unit-title"
-    const textAdCount = await this.page.$$eval('div[data-text-ad="1"]', (links) => links.length);
-    const plaAdCount = await this.page.$$eval('div.pla-unit-title', (links) => links.length);
+    const textAdCount = this.cheerioAPI('div[data-text-ad="1"]').length;
+    const plaAdCount = this.cheerioAPI('div.pla-unit-title').length;
     const adsCount = textAdCount + plaAdCount;
     return adsCount;
   }
 
-  public async getSearchPerf(): Promise<{ searchTime: string; totalResults: string }> {
-    let resultStats, searchTime, totalResults;
-    try {
-      // If no element is found matching selector, the method will throw an error.
-      resultStats = await this.page.$eval('div#result-stats', (el) => el.textContent);
-    } catch (error) {
-      resultStats = null;
-    }
+  private getSearchPerf(): { searchTime: string; totalResults: string } {
+    let searchTime, totalResults;
+
+    const resultStats = this.cheerioAPI('div#result-stats').text();
     if (resultStats) {
       const extracted = this.extractSearchPerfFromRawResult(resultStats);
       searchTime = extracted.searchTime;
@@ -96,56 +172,4 @@ export class SinglePageManipulator {
 
     return { searchTime, totalResults };
   };
-}
-
-export class ScrapeRequest {
-  private keyword: string;
-
-  // private baseUrl: string;
-  private axiosConfig: AxiosRequestConfig;
-
-  constructor(kw: string) {
-    this.keyword = kw.replaceAll(' ', '+');
-
-    const chosenProxy = pickLeastUsedProxy();
-    let axiosProxy: AxiosProxyConfig | undefined;
-    if (chosenProxy.url) {
-      axiosProxy = {
-        host: chosenProxy.host,
-        port: chosenProxy.port,
-        protocol: chosenProxy.protocol,
-        auth: {
-          username: chosenProxy.username,
-          password: chosenProxy.pw,
-        },
-      };
-    }
-
-    this.axiosConfig = {
-      method: 'GET',
-      url: `https://www.google.com/search?q=${this.keyword}`,
-      headers: {
-        'User-Agent': randomUserAgent.getRandom(this.filterUserAgent),
-      },
-      proxy: axiosProxy,
-    };
-  }
-
-  public async scrape() {
-    console.log({conf: this.axiosConfig})
-
-    const response = await axios(this.axiosConfig);
-    const $ = cheerio.load(response.data);
-    const html = $('html').html();
-
-    const fileName = `${this.keyword}-${dayjs().unix()}.html`;
-
-    writeFileSync(path.join(appEnv.HTML_CACHE_PATH, fileName), html);
-
-    return response;
-  }
-
-  private filterUserAgent = (ua: randomUserAgent.UserAgent) => {
-    return ua.userAgent.includes('Chromium');
-  }
 }

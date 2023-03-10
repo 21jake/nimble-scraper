@@ -5,14 +5,12 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
-  Post,
-  Put,
-  Query,
+  Post, Query,
   Request,
   Sse,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
@@ -22,18 +20,12 @@ import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RequestInterceptor } from 'src/interceptor/request.interceptor';
 import { FileService } from 'src/services/file.service';
-import { ScraperService } from 'src/services/scraper.service';
 import { csvMulterOptions } from 'src/utils/helpers';
 
 @Controller('/api/file')
 @UseInterceptors(new RequestInterceptor())
 export class FileController {
-  constructor(private fileService: FileService, private scraperService: ScraperService) {}
-
-  @Put('/')
-  async dummy() {
-    await this.scraperService.dummyScrape()
-  }
+  constructor(private fileService: FileService) {}
 
   @Post('/')
   @UseGuards(JwtAuthGuard)

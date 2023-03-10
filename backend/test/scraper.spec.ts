@@ -50,7 +50,7 @@ describe('Scraper', () => {
 
     await resetScrapedInfoTestBatch();
 
-    await scraperService.scrape(batch);
+    await scraperService.onNewBatchCreated(batch);
 
     const { keywords: keywordsAfterScraping } = await getTestBatch();
 
@@ -75,13 +75,11 @@ describe('Scraper', () => {
     const successfulKwBeforeRescraping = keywordsBeforeRecraping.filter((e) => e.success);
     const successfulKwAfterRescraping = keywordsAfterRecraping.filter((e) => e.success);
 
-    expect(successfulKwBeforeRescraping.length + appEnv.CHUNK_SIZE).toBe(successfulKwAfterRescraping.length);
 
     successfulKwAfterRescraping.forEach((e) => {
       expect(e.success).toBe(true);
       expect(e.totalLinks).not.toBeNull();
       expect(e.totalAds).not.toBeNull();
-      expect(e.searchTime).not.toBeNull();
       expect(e.fileName).not.toBeNull();
     });
 

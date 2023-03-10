@@ -1,12 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import dayjs from 'dayjs';
-import puppeteer from 'puppeteer';
 import { appEnv } from 'src/configs/config';
 import { Batch } from 'src/entities/batch.entity';
 import { Keyword } from 'src/entities/keyword.entity';
 import { Repositories } from 'src/utils/enums/repositories.enum';
-import { sleep } from 'src/utils/helpers';
 import { Repository } from 'typeorm';
 import { FileService } from './file.service';
 import { ScraperService } from './scraper.service';
@@ -14,9 +12,6 @@ import { ScraperService } from './scraper.service';
 @Injectable()
 export class CronService {
   constructor(
-    @Inject(Repositories.BATCH_REPOSITORY)
-    private batchRepository: Repository<Batch>,
-
     @Inject(Repositories.KEYWORD_REPOSITORY)
     private keywordRepository: Repository<Keyword>,
 
@@ -27,12 +22,8 @@ export class CronService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async reScrape() {
-    if (this.fileService.concurrentUploadCount >= appEnv.MAX_CONCURRENT_UPLOAD) {
-      return;
-    }
-
     /**
-     * Get {CHUNK_SIZE} oldest keywords that
+     * Get {CRON_RESCRAPE_SIZE} oldest keywords that
      *  - doesn't have a "true" success result (either failed or not yet scraped)
      *  - createdDate is older than 10 minutes (to filter out new keywords just got uploaded and already wating to be scraped)
      */
@@ -45,20 +36,13 @@ export class CronService {
       .where(`${entityName}.success IS NOT true`)
       .andWhere(`${entityName}.createdDate < :tenMinutesAgo`, { tenMinutesAgo })
       .orderBy(`${entityName}.createdDate`, 'ASC')
-      .take(appEnv.CHUNK_SIZE)
+      .take(10)
       .getMany();
 
     if (!keywords.length) return;
     console.log(`Cron service found ${keywords.length} kws...`);
     console.log({ keywords });
 
-    const args = appEnv.IS_PROD ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
-
-    const browser = await puppeteer.launch({ args });
-
-    await this.scraperService.handleKeywordChunk(keywords, browser);
-
-    await sleep(1000);
-    await browser.close();
+    await this.scraperService.scrapeKeywords(keywords);
   }
 }

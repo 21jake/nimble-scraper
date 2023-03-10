@@ -5,13 +5,12 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
-  Post,
-  Query,
+  Post, Query,
   Request,
   Sse,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
@@ -60,7 +59,10 @@ export class FileController {
 
   @Sse('/:batchId')
   @UseGuards(JwtAuthGuard)
-  async streamBatchDetail(@Param('batchId') batchId: string, @Request() req): Promise<Observable<IObservableData<Keyword[]>>> {
+  async streamBatchDetail(
+    @Param('batchId') batchId: string,
+    @Request() req,
+  ): Promise<Observable<IObservableData<Keyword[]>>> {
     return await this.fileService.streamBatchDetail(batchId, req.user);
   }
 }

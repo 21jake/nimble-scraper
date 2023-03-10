@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Put,
   Query,
   Request,
   Sse,
@@ -21,12 +22,18 @@ import { Keyword } from 'src/entities/keyword.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RequestInterceptor } from 'src/interceptor/request.interceptor';
 import { FileService } from 'src/services/file.service';
+import { ScraperService } from 'src/services/scraper.service';
 import { csvMulterOptions } from 'src/utils/helpers';
 
 @Controller('/api/file')
 @UseInterceptors(new RequestInterceptor())
 export class FileController {
-  constructor(private fileService: FileService) {}
+  constructor(private fileService: FileService, private scraperService: ScraperService) {}
+
+  @Put('/')
+  async dummy() {
+    await this.scraperService.dummyScrape()
+  }
 
   @Post('/')
   @UseGuards(JwtAuthGuard)
@@ -60,7 +67,10 @@ export class FileController {
 
   @Sse('/:batchId')
   @UseGuards(JwtAuthGuard)
-  async streamBatchDetail(@Param('batchId') batchId: string, @Request() req): Promise<Observable<IObservableData<Keyword[]>>> {
+  async streamBatchDetail(
+    @Param('batchId') batchId: string,
+    @Request() req,
+  ): Promise<Observable<IObservableData<Keyword[]>>> {
     return await this.fileService.streamBatchDetail(batchId, req.user);
   }
 }

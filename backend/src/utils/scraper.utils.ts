@@ -4,11 +4,18 @@ import { first } from 'lodash';
 import path from 'path';
 import { Page } from 'puppeteer';
 import { appEnv } from 'src/configs/config';
-
+import axios, { AxiosRequestConfig, AxiosProxyConfig } from 'axios';
+import randomUserAgent from 'random-useragent';
+import * as cheerio from 'cheerio';
 interface IProxy {
   url: string;
   count: number;
   label: string;
+  username: string;
+  protocol: string;
+  pw: string;
+  host: string;
+  port: number;
 }
 
 /**
@@ -66,7 +73,7 @@ export class SinglePageManipulator {
   public async getSearchPerf(): Promise<{ searchTime: string; totalResults: string }> {
     let resultStats, searchTime, totalResults;
     try {
-      // If no element is found matching selector, the method will throw an error. 
+      // If no element is found matching selector, the method will throw an error.
       resultStats = await this.page.$eval('div#result-stats', (el) => el.textContent);
     } catch (error) {
       resultStats = null;
@@ -89,4 +96,56 @@ export class SinglePageManipulator {
 
     return { searchTime, totalResults };
   };
+}
+
+export class ScrapeRequest {
+  private keyword: string;
+
+  // private baseUrl: string;
+  private axiosConfig: AxiosRequestConfig;
+
+  constructor(kw: string) {
+    this.keyword = kw.replaceAll(' ', '+');
+
+    const chosenProxy = pickLeastUsedProxy();
+    let axiosProxy: AxiosProxyConfig | undefined;
+    if (chosenProxy.url) {
+      axiosProxy = {
+        host: chosenProxy.host,
+        port: chosenProxy.port,
+        protocol: chosenProxy.protocol,
+        auth: {
+          username: chosenProxy.username,
+          password: chosenProxy.pw,
+        },
+      };
+    }
+
+    this.axiosConfig = {
+      method: 'GET',
+      url: `https://www.google.com/search?q=${this.keyword}`,
+      headers: {
+        'User-Agent': randomUserAgent.getRandom(this.filterUserAgent),
+      },
+      proxy: axiosProxy,
+    };
+  }
+
+  public async scrape() {
+    console.log({conf: this.axiosConfig})
+
+    const response = await axios(this.axiosConfig);
+    const $ = cheerio.load(response.data);
+    const html = $('html').html();
+
+    const fileName = `${this.keyword}-${dayjs().unix()}.html`;
+
+    writeFileSync(path.join(appEnv.HTML_CACHE_PATH, fileName), html);
+
+    return response;
+  }
+
+  private filterUserAgent = (ua: randomUserAgent.UserAgent) => {
+    return ua.userAgent.includes('Chromium');
+  }
 }

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { chunk } from 'lodash';
+import { chunk, forEach } from 'lodash';
 import puppeteer, { Browser } from 'puppeteer';
 import useProxy from 'puppeteer-page-proxy';
 import { appEnv } from 'src/configs/config';
@@ -9,9 +9,11 @@ import { Keyword } from 'src/entities/keyword.entity';
 import { EmittedEvent } from 'src/utils/enums/event.enum';
 import { Repositories } from 'src/utils/enums/repositories.enum';
 import { sleep } from 'src/utils/helpers';
-import { pickLeastUsedProxy, SinglePageManipulator } from 'src/utils/scraper.utils';
+import { pickLeastUsedProxy, ScrapeRequest, SinglePageManipulator } from 'src/utils/scraper.utils';
 import { Repository } from 'typeorm';
 import { FileService } from './file.service';
+import axios, { isCancel, AxiosError } from 'axios';
+import randomUserAgent from 'random-useragent';
 
 @Injectable()
 export class ScraperService {
@@ -109,7 +111,37 @@ export class ScraperService {
 
     const saved = await this.keywordRepository.save(keywordRecord);
     console.log({ savedKeword: saved });
+  }
 
+  // Test new http scraper
+  async dummyScrape() {
+    // const keywords = ['keyword 1', 'keyword 2', 'keyword 3'];
+    const kws = [
+      'Bánh mì',
+  
+     
+    ];
 
+    const keyword = 'keyword 1';
+
+    // const scrapePromises = kws.map( async (kw) => {
+    //   const scrapeRequest = new ScrapeRequest(kw);
+    //   const data = await scrapeRequest.scrape();
+    //   console.log(data.status)
+    // });
+
+    //  await Promise.all(scrapePromises);
+
+    for (let index = 0; index < kws.length; index++) {
+      const kw = kws[index];
+      const scrapeRequest = new ScrapeRequest(kw);
+      const data = await scrapeRequest.scrape();
+      console.log(data.status)
+      
+    }
+
+    // const scrapeRequest = new ScrapeRequest(keyword);
+    // const data = await scrapeRequest.scrape();
+    // console.log(data.status);
   }
 }

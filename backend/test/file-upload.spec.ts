@@ -8,7 +8,6 @@ import path, { extname } from 'path';
 import { appEnv } from 'src/configs/config';
 import { FileController } from 'src/controllers/file.controller';
 import { DatabaseModule } from 'src/database/database.module';
-import { user } from 'src/database/unit-test.data';
 import { Keyword } from 'src/entities/keyword.entity';
 import { User } from 'src/entities/user.entity';
 import { AuthModule } from 'src/modules/auth.module';
@@ -24,9 +23,7 @@ import request from 'supertest';
 import { Repository } from 'typeorm';
 // jest.useRealTimers();
 describe('File Upload', () => {
-  //   let scraperService: ScraperService;
-  //   let cronService: CronService;
-  //   let batchRepository: Repository<Batch>;
+
   let fileService: FileService;
   let keywordRepository: Repository<Keyword>;
   let fileController: FileController;

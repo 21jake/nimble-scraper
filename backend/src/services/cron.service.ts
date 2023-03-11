@@ -16,8 +16,6 @@ export class CronService {
     private keywordRepository: Repository<Keyword>,
 
     private scraperService: ScraperService,
-
-    private fileService: FileService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)

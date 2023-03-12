@@ -20,7 +20,7 @@ import { ScraperService } from 'src/services/scraper.service';
 import { Repositories } from 'src/utils/enums/repositories.enum';
 import { generateRandomString } from 'src/utils/helpers';
 import request from 'supertest';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 // jest.useRealTimers();
 describe('File Upload', () => {
 
@@ -146,6 +146,9 @@ describe('File Upload', () => {
   };
 
   afterAll(async () => {
+    const instertedKeywords = getKws(samplePath_1);
+    await keywordRepository.delete({ name: In(instertedKeywords) });
+
     unlinkSync(path.join(appEnv.CSV_PATH, savedFileName));
     await app.close();
   });

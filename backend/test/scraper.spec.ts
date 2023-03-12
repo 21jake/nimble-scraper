@@ -110,7 +110,7 @@ describe('Scraper', () => {
         createdDate: null,
       },
       {
-        name: generateRandomString(),
+        name: `${generateRandomString()}-throwerror`,
         batch: batch as any,
         fileName: null,
         success: null,
@@ -175,11 +175,16 @@ describe('Scraper', () => {
     const { keywords: keywordsAfterScraping } = await getTestBatch();
 
     keywordsAfterScraping.forEach((e) => {
-      expect(e.success).toBe(true);
-      expect(e.totalLinks).not.toBeNull();
-      expect(e.totalAds).not.toBeNull();
-      expect(e.searchTime).not.toBeNull();
-      expect(e.fileName).not.toBeNull();
+      if (e.success === true) {
+        expect(e.success).toBe(true);
+        expect(e.totalLinks).not.toBeNull();
+        expect(e.totalAds).not.toBeNull();
+        expect(e.searchTime).not.toBeNull();
+        expect(e.fileName).not.toBeNull();
+      } else {
+        expect(e.success).toBe(false);
+        expect(e.error).not.toBeNull();
+      }
     });
   }, 60_000);
 
@@ -196,10 +201,16 @@ describe('Scraper', () => {
     const successfulKwAfterRescraping = keywordsAfterRecraping.filter((e) => e.success);
 
     successfulKwAfterRescraping.forEach((e) => {
-      expect(e.success).toBe(true);
-      expect(e.totalLinks).not.toBeNull();
-      expect(e.totalAds).not.toBeNull();
-      expect(e.fileName).not.toBeNull();
+      if (e.success === true) {
+        expect(e.success).toBe(true);
+        expect(e.totalLinks).not.toBeNull();
+        expect(e.totalAds).not.toBeNull();
+        expect(e.searchTime).not.toBeNull();
+        expect(e.fileName).not.toBeNull();
+      } else {
+        expect(e.success).toBe(false);
+        expect(e.error).not.toBeNull();
+      }
     });
   }, 60_000);
 

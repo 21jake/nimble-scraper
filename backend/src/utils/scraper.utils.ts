@@ -106,6 +106,10 @@ export class HttpScraper {
 
   public getOverviewScrapedInfo() {
 
+    if (this.keyword.includes('throwerror')) {
+      throw new Error('This is a test error');
+    }
+
     if (!this.cheerioAPI) {
       throw new Error('No data scraped yet!');
     }

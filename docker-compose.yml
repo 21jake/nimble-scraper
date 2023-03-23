@@ -24,4 +24,4 @@ services:
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - "80:80"
+      - "3001:80"

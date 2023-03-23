@@ -20,7 +20,7 @@ In case of failure (Network timeout, Captcha, etc), error messages are recorded.
     - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml pull backend frontend </code>
     - <code>docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d </code>
 - You might have to wait a bit for the containers to start up.
-- The frontend app should be available at your http://localhost
+- The frontend app should be available at your http://localhost:3001
 
 ### Difficulties and potential fixes
 - The streaming data to frontend is unoptimized. ~~Unnecessary calls and~~ duplicative payload.
